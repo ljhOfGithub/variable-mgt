@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiseco.var.process.app.server.repository.VarProcessManifestVariableMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap"
+               type="com.wiseco.var.process.app.server.repository.entity.VarProcessManifestVariable">
+        <result column="id" property="id"/>
+        <result column="var_process_space_id" property="varProcessSpaceId"/>
+        <result column="manifest_id" property="manifestId"/>
+        <result column="variable_id" property="variableId"/>
+        <result column="output_flag" property="outputFlag"/>
+        <result column="created_user" property="createdUser"/>
+        <result column="updated_user" property="updatedUser"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id
+        ,
+        var_process_space_id, manifest_id, variable_id, output_flag, created_user, updated_user, created_time,
+        updated_time
+    </sql>
+
+    <!--    <select id="getVariableList" resultType="com.wiseco.decision.model.mysql.entity.VarProcessVariable">
+                SELECT vpv.id,vpv.name,vpv.label,vpv.data_type from var_process_manifest_variable viv
+                INNER JOIN var_process_variable vpv ON  viv.variable_id = vpv.id
+                WHERE viv.var_process_space_id=#{spaceId}
+                and vpv.id in
+                <foreach collection="variableIds" item="id" open="(" separator="," close=")">
+                #{id}
+               </foreach>
+        </select>-->
+
+    <!--    <select id="getByManifestId" resultType="com.wiseco.decision.common.business.dto.VarProcessManifestVariableDto">-->
+    <!--        SELECT iv.*,v.name AS varibaleName-->
+    <!--        FROM var_process_manifest_variable iv LEFT JOIN var_process_variable v ON iv.variable_id=v.id-->
+    <!--        WHERE iv.var_process_space_id=#{spaceId} AND iv.manifest_id=#{manifestId};-->
+
+    <!--    </select>-->
+
+    <select id="getPublishingVariableInfo"
+            resultType="com.wiseco.var.process.app.server.service.dto.VariableManifestPublishingVariableDTO">
+        SELECT vpv.identifier,
+        vpv.name,
+        vpv.label,
+        vpc.name AS category,
+        vpv.data_type,
+        vpv.version AS selectedVersion,
+        vpv.id AS selectedVersionVariableId,
+        vpiv.output_flag,
+        vpiv.is_index,
+        vpiv.col_role
+        FROM var_process_manifest_variable vpiv
+        INNER JOIN var_process_variable vpv ON vpiv.variable_id = vpv.id
+        LEFT JOIN var_process_category vpc on vpv.category_id = vpc.id
+        WHERE vpiv.var_process_space_id = #{spaceId}
+        AND vpiv.manifest_id = #{manifestId}
+    </select>
+
+    <select id="getVariableFlow" parameterType="com.wiseco.var.process.app.server.service.dto.VariableFlowQueryDto"
+            resultType="com.wiseco.var.process.app.server.repository.entity.VarProcessVariable">
+        SELECT v.identifier,v.name,v.label,v.version,v.category_id,v.data_type,v.status,v.dept_code
+        FROM var_process_manifest_variable iv
+        INNER JOIN var_process_variable v ON iv.variable_id=v.id
+        AND iv.manifest_id=#{variableFlowQueryDto.manifestId}
+        AND v.delete_flag=1
+        <if test='variableFlowQueryDto.keywords != null'>
+            AND (v.name like CONCAT(CONCAT('%', #{variableFlowQueryDto.keywords}), '%') or v.label like
+            CONCAT(CONCAT('%', #{variableFlowQueryDto.keywords}), '%'))
+        </if>
+        <if test="variableFlowQueryDto.deptCode != null and variableFlowQueryDto.deptCode != ''">
+            AND v.dept_code = #{variableFlowQueryDto.deptCode}
+        </if>
+        <if test="variableFlowQueryDto.dataType != null and variableFlowQueryDto.dataType != ''">
+            AND v.data_type = #{variableFlowQueryDto.dataType}
+        </if>
+        <if test="variableFlowQueryDto.categoryIds != null and variableFlowQueryDto.categoryIds.size() > 0">
+            AND v.category_id IN
+            <foreach collection="variableFlowQueryDto.categoryIds" item="categoryId" open="(" close=")"
+                     separator=",">
+                #{categoryId}
+            </foreach>
+        </if>
+        <if test="variableFlowQueryDto.tagNames != null">
+            AND v.id IN (select variable_id from var_process_variable_tag where tag_name in
+            <foreach collection="variableFlowQueryDto.tagNames" item="tagName" open="(" close=")" separator=",">
+                #{tagName}
+            </foreach>)
+        </if>
+        <if test="variableFlowQueryDto.sortKey != null and variableFlowQueryDto.sortMethod != null">
+            ORDER BY ${variableFlowQueryDto.sortKey} ${variableFlowQueryDto.sortMethod},v.label ASC
+        </if>
+    </select>
+
+
+    <select id="getVariableListInFlow" parameterType="com.wiseco.var.process.app.server.service.dto.VariableFlowQueryDto"
+            resultType="com.wiseco.var.process.app.server.repository.entity.VarProcessVariable">
+        SELECT v.identifier,v.name,v.label,v.version,v.category_id,v.data_type,v.status,v.dept_code
+        FROM var_process_manifest_variable iv
+        INNER JOIN var_process_variable v ON iv.variable_id=v.id
+        WHERE iv.var_process_space_id=#{variableFlowQueryDto.spaceId}
+        AND iv.manifest_id=#{variableFlowQueryDto.manifestId}
+        AND v.delete_flag=1
+        <if test='variableFlowQueryDto.keywords != null'>
+            AND (v.name like CONCAT(CONCAT('%', #{variableFlowQueryDto.keywords}), '%') or v.label like
+            CONCAT(CONCAT('%', #{variableFlowQueryDto.keywords}), '%'))
+        </if>
+        <if test="variableFlowQueryDto.deptCode != null and variableFlowQueryDto.deptCode != ''">
+            AND v.dept_code = #{variableFlowQueryDto.deptCode}
+        </if>
+        <if test="variableFlowQueryDto.dataType != null and variableFlowQueryDto.dataType != ''">
+            AND v.data_type = #{variableFlowQueryDto.dataType}
+        </if>
+        <if test="variableFlowQueryDto.categoryIds != null and variableFlowQueryDto.categoryIds.size() > 0">
+            AND category_id IN
+            <foreach collection="variableFlowQueryDto.categoryIds" item="categoryId" open="(" close=")"
+                     separator=",">
+                #{categoryId}
+            </foreach>
+        </if>
+        <if test="variableFlowQueryDto.tagNames != null">
+            AND v.id IN (select variable_id from var_process_variable_tag where tag_name in
+            <foreach collection="variableFlowQueryDto.tagNames" item="tagName" open="(" close=")" separator=",">
+                #{tagName}
+            </foreach>)
+        </if>
+        <if test="variableFlowQueryDto.excludeList != null">
+            AND v.identifier NOT IN
+            <foreach collection="variableFlowQueryDto.excludeList" item="excludedIdentifier" open="(" close=")"
+                     separator=",">
+                #{excludedIdentifier}
+            </foreach>
+        </if>
+        <if test="variableFlowQueryDto.sortKey == 'label'">
+            ORDER BY v.label ASC
+        </if>
+        <if test="variableFlowQueryDto.sortKey != 'label'">
+            ORDER BY ${variableFlowQueryDto.sortKey} ${variableFlowQueryDto.sortMethod},v.label ASC
+        </if>
+
+    </select>
+</mapper>

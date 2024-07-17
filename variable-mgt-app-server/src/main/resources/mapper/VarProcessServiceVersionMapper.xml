@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiseco.var.process.app.server.repository.VarProcessServiceVersionMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wiseco.var.process.app.server.repository.entity.VarProcessServiceVersion">
+        <result column="id" property="id"/>
+        <result column="service_id" property="serviceId"/>
+        <result column="service_version" property="serviceVersion"/>
+        <result column="dept_code" property="deptCode"/>
+        <result column="delete_flag" property="deleteFlag"/>
+        <result column="serial_no" property="createdUser"/>
+        <result column="description" property="description"/>
+        <result column="created_user" property="createdUser"/>
+        <result column="updated_user" property="updatedUser"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+    </resultMap>
+
+    <select id="findServiceInfos"
+            resultType="com.wiseco.var.process.app.server.service.dto.VarProcessServiceVersionInfo">
+        SELECT
+            service_id ,
+            MAX(service_version) AS maxVersion,
+            COUNT(service_version) AS versionCount,
+            COUNT(CASE WHEN state = 'ENABLED' THEN 1 ELSE NULL END) AS upCount,
+            COUNT(CASE WHEN state = 'DISABLED' THEN 1 ELSE NULL END) AS downCount
+        FROM
+            var_process_service_version vpsv
+        WHERE
+            delete_flag = 1
+          and service_id in
+        <foreach item="item" collection='serviceIds' open="(" separator="," close=")">#{item}</foreach>
+        group by service_id
+    </select>
+
+    <select id="findNonDisabledVersionsByServiceId"
+            resultType="com.wiseco.var.process.app.server.repository.entity.VarProcessServiceVersion">
+        select distinct vpsv.id ,dept_code,vpsv.state ,service_version ,description ,vpsv.created_user ,vpsv.updated_user ,vpsv.created_time ,vpsv.updated_time
+        from var_process_service_version vpsv left join var_process_service_manifest vpsm on vpsv.id = vpsm.service_id
+        <where>
+            delete_flag = 1 and vpsv.service_id = #{inputDto.serviceId} and vpsv.state != 'DISABLED'
+              <if test="inputDto.manifestId != null">
+                  and vpsm.manifest_id = #{inputDto.manifestId}
+              </if>
+            <if test="inputDto.deptCode != null and inputDto.deptCode != ''">
+                and vpsv.dept_code = #{inputDto.deptCode}
+            </if>
+        </where>
+        order by service_version desc
+    </select>
+
+    <select id="findUpServicePage"
+            resultType="com.wiseco.var.process.app.server.controller.vo.output.RestServiceListOutputVO">
+        select vprs.service_name as serviceName,vprs.service_code as serviceCode,vpsv.id as serviceId
+        from var_process_realtime_service vprs join var_process_service_version vpsv on vpsv.service_id = vprs.id
+        <where>
+            vprs.delete_flag = 1 and vpsv.delete_flag = 1 and vpsv.state = 'ENABLED'
+            <if test="criteria.codeList != null and criteria.codeList.size() > 0">
+                and vprs.service_code in
+                    <foreach item="item" collection='criteria.codeList' open="(" separator="," close=")">#{item}</foreach>
+            </if>
+            <if test="criteria.notInCodeList != null and criteria.notInCodeList.size() > 0">
+                and vprs.service_code not in
+                <foreach item="item" collection='criteria.notInCodeList' open="(" separator="," close=")">#{item}</foreach>
+            </if>
+            <if test="criteria.keyWord != null and criteria.keyWord != ''">
+                and (vprs.service_name like concat('%',#{criteria.keyWord},'%') OR vprs.service_code like concat('%',#{criteria.keyWord},'%'))
+            </if>
+        </where>
+        order by vprs.service_code
+    </select>
+
+    <select id="findsServiceListByVersionIds"
+            resultType="com.wiseco.var.process.app.server.service.dto.ServiceInfoDto">
+        select vprs.service_code as code,vprs.service_name as name,vpsv.service_version as version,vpsv.id from var_process_service_version vpsv
+        join var_process_realtime_service vprs on vprs.id = vpsv.service_id
+        where vprs.delete_flag = 1 and vpsv.delete_flag = 1 and vpsv.id in
+        <foreach collection='serviceIds' item='versionId' open='(' separator=',' close=')'> #{versionId} </foreach>
+    </select>
+
+    <select id="findServiceListByState"
+            resultType="com.wiseco.var.process.app.server.service.dto.ServiceInfoDto">
+        select vprs.service_code as code,vprs.service_name as name,vpsv.service_version as version,vpsv.state,vpsv.id from var_process_service_version vpsv
+        join var_process_realtime_service vprs on vprs.id = vpsv.service_id where vprs.delete_flag = 1 and vpsv.delete_flag = 1 and vpsv.state in
+        <foreach collection='states' item='state' open='(' separator=',' close=')'> #{state} </foreach>
+
+        <if test="deptCodes !=null and deptCodes.size() != 0">
+            AND vprs.dept_code in
+            <foreach item="item" collection='deptCodes' open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        <if test="userNames !=null and userNames.size() != 0">
+            AND vprs.created_user in
+            <foreach item="item" collection='userNames' open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="findAllServiceInfos" resultType="com.wiseco.var.process.app.server.service.dto.ServiceInfoDto">
+        select vprs.service_name as name, vpsv.service_version as version, vpsv.state, vpsv.id
+        from var_process_service_version vpsv
+                 join var_process_realtime_service vprs on vprs.id = vpsv.service_id
+        where vprs.delete_flag = 1  and vpsv.delete_flag = 1
+        <if test="deptCodes !=null and deptCodes.size() != 0">
+            AND vprs.dept_code in
+            <foreach item="item" collection='deptCodes' open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        <if test="userNames !=null and userNames.size() != 0">
+            AND vprs.created_user in
+            <foreach item="item" collection='userNames' open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+</mapper>

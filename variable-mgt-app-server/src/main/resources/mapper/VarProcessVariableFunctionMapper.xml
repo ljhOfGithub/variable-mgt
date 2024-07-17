@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiseco.var.process.app.server.repository.VarProcessVariableFunctionMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wiseco.var.process.app.server.repository.entity.VarProcessVariableFunction">
+        <result column="id" property="id"/>
+        <result column="var_process_space_id" property="varProcessSpaceId"/>
+        <result column="variable_id" property="variableId"/>
+        <result column="function_id" property="functionId"/>
+        <result column="created_user" property="createdUser"/>
+        <result column="updated_user" property="updatedUser"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        var_process_space_id, variable_id, function_id, function_name, created_user, updated_user, created_time,
+        updated_time
+    </sql>
+    <select id="getVariableUtilizedVariableTemplate"
+            resultType="com.wiseco.var.process.app.server.repository.entity.VarProcessFunction">
+        SELECT vpf.*
+        FROM var_process_variable_function vpvf
+        INNER JOIN var_process_function vpf ON vpvf.function_id = vpf.id
+        <if test="variableIdList != null and variableIdList.size() > 0">
+            WHERE vpvf.id IN
+            <foreach collection="variableIdList" item="variableId" open="(" close=")" separator=",">
+                #{variableId}
+            </foreach>
+        </if>
+    </select>
+
+</mapper>

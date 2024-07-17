@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiseco.var.process.app.server.repository.VarProcessServiceCycleMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wiseco.var.process.app.server.repository.entity.VarProcessServiceCycle">
+        <result column="id" property="id"/>
+        <result column="service_id" property="serviceId"/>
+        <result column="operation" property="operation"/>
+        <result column="status" property="status"/>
+        <result column="description" property="description"/>
+        <result column="created_user" property="createdUser"/>
+        <result column="updated_user" property="updatedUser"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+    </resultMap>
+
+    <!--根据服务的ID查询出它最新的拒绝原因-->
+    <select id="getLastestVarProcessServiceCycle" resultMap="BaseResultMap" parameterType="long">
+        select id,
+        service_id,
+        operation,
+        status,
+        description,
+        created_user,
+        updated_user,
+        created_time,
+        updated_time
+        from var_process_service_cycle
+        where service_id = #{serviceId}
+        and status = 'REJECTED'
+        order by created_time desc
+        limit 0, 1;
+    </select>
+
+</mapper>

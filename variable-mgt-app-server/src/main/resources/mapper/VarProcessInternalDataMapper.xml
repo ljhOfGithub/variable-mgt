@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiseco.var.process.app.server.repository.VarProcessInternalDataMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wiseco.var.process.app.server.repository.entity.VarProcessInternalData">
+        <result column="id" property="id"/>
+        <result column="var_process_space_id" property="varProcessSpaceId"/>
+        <result column="identifier" property="identifier"/>
+        <result column="name" property="name"/>
+        <result column="object_name" property="objectName"/>
+        <result column="object_label" property="objectLabel"/>
+
+        <result column="delete_flag" property="deleteFlag"/>
+        <result column="content" property="content"/>
+        <result column="created_user" property="createdUser"/>
+        <result column="updated_user" property="updatedUser"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        var_process_space_id, identifier, name, object_name, object_label, delete_flag, content, created_user,
+        updated_user, created_time, updated_time
+    </sql>
+    <select id="findPageList" resultType="com.wiseco.var.process.app.server.repository.entity.VarProcessInternalData">
+
+        SELECT
+        id,var_process_space_id, identifier, name, object_name,object_label,
+        created_user, updated_user, created_time, updated_time
+        FROM var_process_internal_data
+        <where>
+            delete_flag=1
+            <if test="spaceId != null and spaceId!=''">
+                AND var_process_space_id = #{spaceId}
+            </if>
+            <if test="keywords != null and keywords!=''">
+                AND (name like CONCAT(concat('%',#{keywords}),'%') or object_name like
+                CONCAT(concat('%',#{keywords}),'%') or object_label like CONCAT(concat('%',#{keywords}),'%'))
+            </if>
+
+        </where>
+
+        order by id desc
+
+    </select>
+    <select id="findByIdentifier"
+            resultType="com.wiseco.var.process.app.server.repository.entity.VarProcessInternalData">
+        SELECT *
+        FROM var_process_internal_data
+        WHERE delete_flag = 1
+        AND identifier = #{identifier}
+        AND var_process_space_id = #{spaceId}
+        order by id desc
+    </select>
+</mapper>

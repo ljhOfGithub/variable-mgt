@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wiseco.var.process.app.server.repository.VarProcessStatisticsConfigMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wiseco.var.process.app.server.repository.entity.VarProcessStatisticsConfig">
+        <result column="id" property="id"/>
+        <result column="var_process_service_id" property="varProcessServiceId"/>
+        <result column="var_process_manifest_id" property="varProcessManifestId"/>
+        <result column="start_date" property="startDate"/>
+        <result column="end_date" property="endDate"/>
+        <result column="analysis_index" property="analysisIndex"/>
+        <result column="iv_config" property="ivConfig"/>
+        <result column="psi_config" property="psiConfig"/>
+        <result column="special_val_config" property="specialValConfig"/>
+        <result column="created_user" property="createdUser"/>
+        <result column="updated_user" property="updatedUser"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+    </resultMap>
+
+    <select id="findCurrentStatistics" resultType="com.wiseco.var.process.app.server.repository.entity.VarProcessStatisticsConfig">
+        select vpsc.var_process_service_id, vpsc.var_process_manifest_id
+        from var_process_statistics_config AS vpsc
+        where start_date &lt;= #{now} and end_date &gt; #{now};
+    </select>
+
+    <select id="findAccessConfig" resultType="java.lang.Long">
+        select vpsc.id from var_process_statistics_config vpsc
+        join var_process_service_version vpsv on vpsv.id = vpsc.var_process_service_id
+        join var_process_realtime_service vprs on vprs.id = vpsv.service_id
+        where vprs.delete_flag = 1
+        <if test="deptCodes !=null and deptCodes.size() != 0">
+            AND vprs.dept_code in
+            <foreach item="item" collection='deptCodes' open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        <if test="userNames !=null and userNames.size() != 0">
+            AND vprs.created_user in
+            <foreach item="item" collection='userNames' open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+</mapper>

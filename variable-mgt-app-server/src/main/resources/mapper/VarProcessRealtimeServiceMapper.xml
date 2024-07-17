@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiseco.var.process.app.server.repository.VarProcessRealtimeServiceMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wiseco.var.process.app.server.repository.entity.VarProcessRealtimeService">
+        <result column="id" property="id"/>
+        <result column="space_id" property="spaceId"/>
+        <result column="code" property="serviceCode"/>
+        <result column="name" property="serviceName"/>
+        <result column="delete_flag" property="deleteFlag"/>
+        <result column="created_user" property="createdUser"/>
+        <result column="updated_user" property="updatedUser"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+        <result column="enable_trace" property="enableTrace"/>
+        <result column="message_format" property="messageFormat"/>
+        <result column="category_id" property="categoryId"/>
+    </resultMap>
+
+    <select id="findServiceBasicInfo"
+            resultType="com.wiseco.var.process.app.server.repository.entity.VarProcessRealtimeService">
+        select vprs.id ,vprs.service_code ,vprs.service_name,vprs.category_id ,vprs.enable_trace ,vprs.message_format
+        from var_process_realtime_service vprs
+        left join var_process_service_version vpsv on vprs.id = vpsv.service_id and vpsv.delete_flag = 1
+        left join var_process_service_manifest vpsm on vpsm.service_id = vpsv.id
+        where vprs.delete_flag = 1
+        <if test="queryDto.categoryIds!=null and queryDto.categoryIds.size() > 0">
+            AND category_id in
+            <foreach item="item" collection='queryDto.categoryIds' open="(" separator="," close=")">#{item}</foreach>
+        </if>
+        <if test="queryDto.keyWord!=null and queryDto.keyWord!=''">
+            and (service_name like concat('%',#{queryDto.keyWord},'%') OR service_code like concat('%',#{queryDto.keyWord},'%'))
+        </if>
+        <if test="queryDto.manifestId!=null">
+            AND vpsm.manifest_id = #{queryDto.manifestId}
+        </if>
+        <if test="queryDto.deptCode!=null and queryDto.deptCode!=''">
+            AND vpsv.dept_code = #{queryDto.deptCode}
+        </if>
+        <if test="queryDto.deptCodes !=null and queryDto.deptCodes.size() != 0">
+            AND vprs.dept_code in
+            <foreach item="item" collection='queryDto.deptCodes' open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        <if test="queryDto.userNames !=null and queryDto.userNames.size() != 0">
+            AND vprs.created_user in
+            <foreach item="item" collection='queryDto.userNames' open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+                group by vprs.id, vprs.service_code,vprs.service_name,vprs.category_id ,vprs.enable_trace ,vprs.message_format, vprs.updated_time
+                order by vprs.updated_time desc
+    </select>
+
+    <select id="findServiceBasicInfoCount"
+            resultType="java.lang.Integer">
+
+        select count(*) from(
+        select vprs.id ,vprs.service_code ,vprs.service_name,vprs.category_id ,vprs.enable_trace ,vprs.message_format
+        from var_process_realtime_service vprs
+        left join var_process_service_version vpsv on vprs.id = vpsv.service_id and vpsv.delete_flag = 1
+        left join var_process_service_manifest vpsm on vpsm.service_id = vpsv.id
+        where vprs.delete_flag = 1
+        <if test="queryDto.categoryIds!=null and queryDto.categoryIds.size() > 0">
+            AND category_id in
+            <foreach item="item" collection='queryDto.categoryIds' open="(" separator="," close=")">#{item}</foreach>
+        </if>
+        <if test="queryDto.keyWord!=null and queryDto.keyWord!=''">
+            and (service_name like concat('%',#{queryDto.keyWord},'%') OR service_code like concat('%',#{queryDto.keyWord},'%'))
+        </if>
+        <if test="queryDto.manifestId!=null">
+            AND vpsm.manifest_id = #{queryDto.manifestId}
+        </if>
+        <if test="queryDto.deptCode!=null and queryDto.deptCode!=''">
+            AND vpsv.dept_code = #{queryDto.deptCode}
+        </if>
+        <if test="queryDto.deptCodes !=null and queryDto.deptCodes.size() != 0">
+            AND vprs.dept_code in
+            <foreach item="item" collection='queryDto.deptCodes' open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        <if test="queryDto.userNames !=null and queryDto.userNames.size() != 0">
+            AND vprs.created_user in
+            <foreach item="item" collection='queryDto.userNames' open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        ) TOTAL
+    </select>
+
+
+
+    <select id="findSimpleUpServiceList"
+            resultType="com.wiseco.var.process.app.server.controller.vo.output.VarSimpleServiceOutputDto">
+        select vprs.id as id,vprs.service_code as code,vprs.service_name as name from var_process_service_version vpsv join var_process_realtime_service vprs on vprs.id = vpsv.service_id
+        <where>
+            vprs.delete_flag = 1 and vprs.delete_flag = 1 and vpsv.state = 'ENABLED'
+            <if test="excludeCodes != null and excludeCodes.size() > 0">
+                and vprs.service_code not in
+                <foreach item="item" collection='excludeCodes' open="(" separator="," close=")">#{item}</foreach>
+            </if>
+            <if test="keyWord != null and keyWord != ''">
+                and (vprs.service_name like concat('%',#{keyWord},'%') or vprs.service_code like concat('%',#{keyWord},'%'))
+            </if>
+            <if test="deptCodes != null and deptCodes.size()!=0">
+                and vprs.dept_code in
+               <foreach collection="deptCodes" item="item" open="(" separator="," close=")">
+                   #{item}
+               </foreach>
+            </if>
+            <if test="userNames != null and userNames.size()!=0">
+                and vprs.created_user in
+                <foreach collection="userNames" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+           order by vprs.service_code
+    </select>
+</mapper>

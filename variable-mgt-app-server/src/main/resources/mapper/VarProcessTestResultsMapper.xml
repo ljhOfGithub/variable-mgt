@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiseco.var.process.app.server.repository.VarProcessTestResultsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wiseco.var.process.app.server.repository.entity.VarProcessTestResults">
+        <result column="id" property="id"/>
+        <result column="test_id" property="testId"/>
+        <result column="variable_id" property="variableId"/>
+        <result column="change_num" property="changeNum"/>
+        <result column="test_time" property="testTime"/>
+        <result column="data_count" property="dataCount"/>
+        <result column="execute_normal_count" property="executeNormalCount"/>
+        <result column="execute_exception_count" property="executeExceptionCount"/>
+        <result column="execute_resulteq_count" property="executeResulteqCount"/>
+        <result column="execute_resultneq_count" property="executeResultneqCount"/>
+        <result column="success_rate" property="successRate"/>
+        <result column="execute_time" property="executeTime"/>
+        <result column="batch_no" property="batchNo"/>
+        <result column="created_user" property="createdUser"/>
+        <result column="updated_user" property="updatedUser"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        test_id, variable_id, change_num, test_time, data_count, execute_normal_count, execute_exception_count,
+        execute_resulteq_count, execute_resultneq_count, success_rate, execute_time, batch_no, created_user,
+        updated_user, created_time, updated_time
+    </sql>
+
+</mapper>

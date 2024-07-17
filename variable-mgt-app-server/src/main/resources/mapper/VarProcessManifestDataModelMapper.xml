@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiseco.var.process.app.server.repository.VarProcessManifestDataModelMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap"
+               type="com.wiseco.var.process.app.server.repository.entity.VarProcessManifestDataModel">
+        <result column="id" property="id"/>
+        <result column="var_process_space_id" property="varProcessSpaceId"/>
+        <result column="manifest_id" property="manifestId"/>
+        <result column="object_name" property="objectName"/>
+        <result column="object_version" property="objectVersion"/>
+        <result column="source_type" property="sourceType"/>
+        <result column="created_user" property="createdUser"/>
+        <result column="updated_user" property="updatedUser"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        var_process_space_id, manifest_id, object_name, object_version, source_type, created_user, updated_user,
+        created_time, updated_time
+    </sql>
+
+    <select id="getMaxVersionDataModel" parameterType="string" resultType="com.wiseco.var.process.app.server.repository.entity.VarProcessDataModel">
+        SELECT
+            vpdm.id,
+            vpdm.var_process_space_id,
+            vpdm.object_name,
+            vpdm.object_source_type,
+            vpdm.version
+        FROM
+            var_process_data_model AS vpdm
+        WHERE
+            vpdm.object_name = #{objectName}
+            AND vpdm.version = (
+                SELECT
+                    MAX(vpdm_sub.version)
+                FROM
+                    var_process_data_model AS vpdm_sub
+                WHERE
+                    vpdm_sub.object_name = #{objectName});
+    </select>
+
+</mapper>

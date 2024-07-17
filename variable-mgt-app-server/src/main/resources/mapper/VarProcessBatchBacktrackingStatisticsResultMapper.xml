@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wiseco.var.process.app.server.repository.VarProcessBatchBacktrackingStatisticsResultMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap"
+               type="com.wiseco.var.process.app.server.repository.entity.VarProcessBatchBacktrackingStatisticsResult">
+        <result column="id" property="id"/>
+        <result column="backtracking_config_id" property="backtrackingConfigId"/>
+        <result column="var_name" property="varName"/>
+        <result column="data_type" property="dataType"/>
+        <result column="iv_result" property="ivResult"/>
+        <result column="psi_result" property="psiResult"/>
+        <result column="missing_ratio" property="missingRatio"/>
+        <result column="unique_num" property="uniqueNum"/>
+        <result column="unique_val" property="uniqueVal"/>
+        <result column="special_ratio" property="specialRatio"/>
+        <result column="zero_ratio" property="zeroRatio"/>
+        <result column="minimum_val" property="minimumVal"/>
+        <result column="max_val" property="maxVal"/>
+        <result column="average_val" property="averageVal"/>
+        <result column="percentage_result" property="percentageResult"/>
+        <result column="created_user" property="createdUser"/>
+        <result column="updated_user" property="updatedUser"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+    </resultMap>
+
+
+    <select id="getPageList"
+            parameterType="com.wiseco.var.process.app.server.controller.vo.input.BacktrackingStatisticsResultQueryVO"
+            resultType="java.util.Map">
+        SELECT
+        bsr.var_name as "变量名称",
+        bsr.data_type as "数据类型",
+        bsr.iv_result as IV,
+        bsr.psi_result as PSI,
+        bsr.missing_ratio as "缺失值占比",
+        bsr.unique_num as "唯一值数量",
+        bsr.unique_val as uniqueVal,
+        bsr.special_ratio as "特殊值占比",
+        bsr.zero_ratio as "零值占比",
+        bsr.minimum_val as "最小值",
+        bsr.max_val as "最大值",
+        bsr.average_val as "均值",
+        bsr.percentage_result as percentageResult
+
+        FROM var_process_batch_backtracking_statistics_result bsr join var_process_batch_backtracking_statistics_config bsc on bsr.backtracking_config_id =
+        bsc.id
+
+        <where>
+            1 = 1
+            <if test="queryVO.backtrackingId != null and queryVO.backtrackingId != ''">
+                AND bsc.backtracking_id = #{queryVO.backtrackingId}
+            </if>
+
+            <if test="queryVO.indexName != null and queryVO.indexName != ''">
+                AND bsr.var_name LIKE concat('%',#{queryVO.indexName},'%')
+            </if>
+        </where>
+        ORDER BY ${queryVO.sortKey} ${queryVO.sortType}
+    </select>
+
+
+    <select id="getPageList"
+            parameterType="com.wiseco.var.process.app.server.controller.vo.input.BacktrackingStatisticsResultQueryVO"
+            resultType="java.util.Map"
+            databaseId="dm">
+        SELECT
+        bsr.var_name as "变量名称",
+        bsr.data_type as "数据类型",
+        bsr.iv_result as IV,
+        bsr.psi_result as PSI,
+        bsr.missing_ratio as "缺失值占比",
+        bsr.unique_num as "唯一值数量",
+        convert(varchar,bsr.unique_val)  as "uniqueVal",
+        bsr.special_ratio as "特殊值占比",
+        bsr.zero_ratio as "零值占比",
+        bsr.minimum_val as "最小值",
+        bsr.max_val as "最大值",
+        bsr.average_val as "均值",
+        bsr.percentage_result as percentageResult
+
+        FROM var_process_batch_backtracking_statistics_result bsr join var_process_batch_backtracking_statistics_config bsc on bsr.backtracking_config_id =
+        bsc.id
+
+        <where>
+            1 = 1
+            <if test="queryVO.backtrackingId != null and queryVO.backtrackingId != ''">
+                AND bsc.backtracking_id = #{queryVO.backtrackingId}
+            </if>
+
+            <if test="queryVO.indexName != null and queryVO.indexName != ''">
+                AND bsr.var_name LIKE concat('%',#{queryVO.indexName},'%')
+            </if>
+        </where>
+        ORDER BY ${queryVO.sortKey} ${queryVO.sortType}
+    </select>
+</mapper>

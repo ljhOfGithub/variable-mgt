@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiseco.var.process.app.server.repository.SysParamMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wiseco.var.process.app.server.repository.entity.SysParam">
+        <result column="id" property="id"/>
+        <result column="param_name" property="paramName"/>
+        <result column="param_name_cn" property="paramNameCn"/>
+        <result column="data_type" property="dataType"/>
+        <result column="param_type" property="paramType"/>
+        <result column="param_value" property="paramValue"/>
+        <result column="used_flag" property="usedFlag"/>
+        <result column="delete_flag" property="deleteFlag"/>
+        <result column="created_user" property="createdUser"/>
+        <result column="updated_user" property="updatedUser"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        param_classification, param_name, param_name_cn, data_type, param_type, param_value, used_flag, delete_flag,
+        created_user, updated_user, created_time, updated_time
+    </sql>
+
+    <select id="findSysParamPage" resultMap="BaseResultMap">
+        select id,
+        param_name,
+        param_name_cn,
+        data_type,
+        param_type,
+        in_param_type,
+        param_value,
+        used_flag,
+        delete_flag,
+        description,
+        created_user,
+        updated_user,
+        created_time,
+        updated_time
+        from sys_param
+        where delete_flag = 1 and in_param_type != 1
+        <if test="queryNameOrNameCn != null and queryNameOrNameCn != ''">
+            and(param_name like CONCAT(concat('%',#{queryNameOrNameCn}),'%') or param_name_cn like
+            CONCAT(concat('%',#{queryNameOrNameCn}),'%'))
+        </if>
+    </select>
+</mapper>

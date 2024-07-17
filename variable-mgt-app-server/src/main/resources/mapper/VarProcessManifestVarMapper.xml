@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiseco.var.process.app.server.repository.VarProcessManifestVarMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wiseco.var.process.app.server.repository.entity.VarProcessManifestVar">
+        <result column="id" property="id"/>
+        <result column="manifest_id" property="manifestId"/>
+        <result column="var_path" property="varPath"/>
+        <result column="var_name" property="varName"/>
+        <result column="var_type" property="varType"/>
+        <result column="is_self" property="isSelf"/>
+        <result column="is_array" property="isArray"/>
+        <result column="is_extend" property="isExtend"/>
+        <result column="parameter_label" property="parameterLabel"/>
+        <result column="parameter_type" property="parameterType"/>
+        <result column="is_parameter_array" property="isParameterArray"/>
+        <result column="test_flag" property="testFlag"/>
+        <result column="action_history" property="actionHistory"/>
+        <result column="created_user" property="createdUser"/>
+        <result column="updated_user" property="updatedUser"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        manifest_id, var_path, var_name, var_type, is_self, is_array, is_extend, parameter_label, parameter_type,
+        is_parameter_array, test_flag, action_history, created_user, updated_user, created_time, updated_time
+    </sql>
+
+</mapper>

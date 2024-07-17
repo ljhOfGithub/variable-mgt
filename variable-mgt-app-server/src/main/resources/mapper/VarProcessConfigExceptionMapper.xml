@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiseco.var.process.app.server.repository.VarProcessConfigExceptionMapper">
+    <resultMap id="BaseResultMap" type="com.wiseco.var.process.app.server.repository.entity.VarProcessConfigExcept">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="var_process_space_id" jdbcType="INTEGER" property="varProcessSpaceId"/>
+        <result column="exception_value_code" jdbcType="VARCHAR" property="exceptionValueCode"/>
+        <result column="data_type" jdbcType="VARCHAR" property="dataType"/>
+        <result column="delete_flag" jdbcType="TINYINT" property="deleteFlag"/>
+        <result column="exception_value" jdbcType="VARCHAR" property="exceptionValue"/>
+        <result column="exception_type" jdbcType="TINYINT" property="exceptionType"/>
+        <result column="exception_explain" jdbcType="VARCHAR" property="exceptionExplain"/>
+        <result column="created_user" jdbcType="VARCHAR" property="createdUser"/>
+        <result column="updated_user" jdbcType="VARCHAR" property="updatedUser"/>
+        <result column="created_time" jdbcType="TIMESTAMP" property="createdTime"/>
+        <result column="updated_time" jdbcType="TIMESTAMP" property="updatedTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, var_process_space_id, exception_value_code,data_type, exception_value, exception_type, exception_explain,
+        created_user, updated_user, created_time, updated_time
+    </sql>
+
+    <select id="getConfigExceptionValueList"
+            parameterType="com.wiseco.var.process.app.server.service.dto.VarProcessConfigExceptionQueryDto"
+            resultType="com.wiseco.var.process.app.server.service.dto.VarProcessConfigExceptionDto">
+
+        SELECT
+        vpe.id,vpe.var_process_space_id,vpe.exception_value_code,vpe.data_type,vpe.exception_value,vpe.exception_type,vpe.exception_explain,
+        vpe.created_user,vpe.updated_user,vpe.created_time,vpe.updated_time
+        from var_process_config_exception vpe
+
+        <where>
+
+            <if test="queryDto.varProcessSpaceId != null and queryDto.varProcessSpaceId!=0">
+                AND vpe.var_process_space_id = #{queryDto.varProcessSpaceId}
+            </if>
+
+            <if test="queryDto.exceptionValueCode != null and queryDto.exceptionValueCode!=''">
+                AND vpe.exception_value_code = #{queryDto.exceptionValueCode}
+            </if>
+
+            <if test="queryDto.exceptionType != null and queryDto.exceptionType!=0">
+                AND vpe.exception_type = #{queryDto.exceptionType}
+            </if>
+
+            <if test="queryDto.deleteFlag != null">
+                AND vpe.delete_flag = #{queryDto.deleteFlag}
+            </if>
+
+            <if test="queryDto.dataType != null and queryDto.dataType!=''">
+                AND vpe.data_type = #{queryDto.dataType}
+            </if>
+
+            <if test="queryDto.exceptionExplain != null and queryDto.exceptionExplain!=''">
+                AND vpe.exception_explain like CONCAT(concat('%',#{queryDto.exceptionExplain}),'%')
+            </if>
+
+
+        </where>
+        order by vpe.created_time desc
+
+    </select>
+
+</mapper>

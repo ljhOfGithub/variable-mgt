@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: variable-mgt-app
+  cloud:
+    nacos:
+      config:
+        extension-configs:
+          - data-id: decision-component-static-template-config-java.yml
+            group: ${decision_spring_cloud_nacos_group}
+            refresh: true
+wiseco:
+  boot:
+    enabled: true
+    rpc:
+      enabled: true
+    config:
+      enabled: true
+

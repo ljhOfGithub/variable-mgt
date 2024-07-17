@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiseco.var.process.app.server.repository.VarProcessBatchBacktrackingMapper">
+    <!--通用查询映射结果-->
+    <resultMap id="BaseResultMap"
+               type="com.wiseco.var.process.app.server.repository.entity.VarProcessBatchBacktracking">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="manifest_id" property="manifestId"/>
+        <result column="variable_size" property="variableSize"/>
+        <result column="trigger_type" property="triggerType"/>
+        <result column="description" property="description"/>
+        <result column="status" property="status"/>
+        <result column="delete_flag" property="deleteFlag"/>
+        <result column="created_user" property="createdUser"/>
+        <result column="updated_user" property="updatedUser"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+        <result column="dept_name" property="deptName"/>
+        <result column="dept_code" property="deptCode"/>
+    </resultMap>
+    <!--通用查询结果列-->
+    <sql id="Base_Column_List">
+        id,
+        name, manifest_id, variable_size, trigger_type, description, status, delete_flag, created_user, updated_user,
+        created_time, updated_time, dept_name, dept_code
+    </sql>
+
+    <select id="findBacktrackingList" parameterType="com.wiseco.var.process.app.server.service.dto.BacktrackingQueryDto"
+            resultType="com.wiseco.var.process.app.server.service.dto.BacktrackingDetailDto">
+        SELECT vpb.id,
+        vpb.name,
+        vpb.manifest_id,
+        vpm.manifest_name,
+        vpb.variable_size,
+        vpb.trigger_type,
+        vpb.status,
+        vpb.dept_name,
+        vpb.dept_code,
+        vpb.created_user,
+        vpb.updated_user,
+        vpb.created_time,
+        vpb.updated_time,
+        vpb.enable_trace,
+        vpbt2.task_status,
+        vpbt2.start_time
+        FROM var_process_batch_backtracking vpb
+        LEFT JOIN (SELECT max(start_time) start_time,backtracking_id FROM var_process_batch_backtracking_task GROUP BY
+        backtracking_id) vpbt1 ON vpb.id = vpbt1.backtracking_id
+        LEFT JOIN (SELECT id,backtracking_id,status AS task_status,start_time FROM var_process_batch_backtracking_task)
+        vpbt2 ON vpbt1.start_time = vpbt2.start_time and
+        vpbt1.backtracking_id=vpbt2.backtracking_id
+        LEFT JOIN (SELECT id,var_manifest_name AS manifest_name FROM var_process_manifest) vpm ON vpb.manifest_id =
+        vpm.id
+        <where>
+            vpb.delete_flag = 1
+            <if test="queryDto.manifestId != null and queryDto.manifestId != ''">
+                AND vpb.manifest_id = #{queryDto.manifestId}
+            </if>
+
+            <if test="queryDto.triggerType != null">
+                AND vpb.trigger_type = #{queryDto.triggerType}
+            </if>
+
+            <if test="queryDto.status != null">
+                AND vpb.status = #{queryDto.status}
+            </if>
+
+            <if test="queryDto.deptCode != null and queryDto.deptCode != ''">
+                AND vpb.dept_code = #{queryDto.deptCode}
+            </if>
+
+            <if test="queryDto.taskStatus != null and  queryDto.taskStatus != '' and queryDto.taskStatus != 'NOT_EXECUTED'">
+                AND vpbt2.task_status = #{queryDto.taskStatus}
+            </if>
+
+            <if test="queryDto.taskStatus != null and  queryDto.taskStatus != '' and queryDto.taskStatus == 'NOT_EXECUTED'">
+                AND vpbt2.task_status is null
+            </if>
+
+            <if test="queryDto.name != null and queryDto.name != ''">
+                AND vpb.name LIKE concat('%',#{queryDto.name},'%')
+            </if>
+
+            <if test="queryDto.deptCodes !=null and queryDto.deptCodes.size() != 0">
+                AND dept_code in
+                <foreach item="item" collection='queryDto.deptCodes' open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+            <if test="queryDto.userNames !=null and queryDto.userNames.size() != 0">
+                AND created_user in
+                <foreach item="item" collection='queryDto.userNames' open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        <if test="queryDto.sortKey == 'updated_time'">
+            ORDER BY vpb.updated_time DESC
+        </if>
+        <if test="queryDto.sortKey != 'updated_time'">
+            ORDER BY ${queryDto.sortKey} ${queryDto.sortType}, vpb.updated_time DESC
+        </if>
+
+    </select>
+</mapper>

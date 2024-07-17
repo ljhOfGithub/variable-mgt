@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiseco.var.process.app.server.repository.VarProcessDictDetailsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wiseco.var.process.app.server.repository.entity.VarProcessDictDetails">
+        <result column="id" property="id"/>
+        <result column="var_process_space_id" property="varProcessSpaceId"/>
+        <result column="dict_id" property="dictId"/>
+        <result column="code" property="code"/>
+        <result column="name" property="name"/>
+        <result column="parent_code" property="parentCode"/>
+        <result column="state" property="state"/>
+        <result column="delete_flag" property="deleteFlag"/>
+        <result column="created_user" property="createdUser"/>
+        <result column="updated_user" property="updatedUser"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        var_process_space_id, dict_id, code, name, parent_code, state, delete_flag, created_user, updated_user,
+        created_time, updated_time
+    </sql>
+
+    <update id="updateParent">
+        update var_process_dict_details
+        set parent_code = #{newCode},
+            updated_time = now()
+        where dict_id = #{dictId}
+        and parent_code = #{oldCode}
+    </update>
+
+    <update id="updateParent" databaseId="sqlServer">
+        update var_process_dict_details
+        set parent_code = #{newCode},
+            updated_time = GETDATE()
+        where dict_id = #{dictId}
+          and parent_code = #{oldCode}
+    </update>
+</mapper>

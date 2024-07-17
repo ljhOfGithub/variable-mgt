@@ -1,0 +1,4541 @@
+var_template_static: "{
+  	\"break_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"text\",
+  			\"label\": \"跳出循环(break)\",
+  			\"value\": \" \n break;\"
+  		}]
+  	},
+  	\"continue_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"text\",
+  			\"label\": \"继续循环(continue)\",
+  			\"value\": \" \n continue;\"
+  		}]
+  	},
+  	\"return_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"text\",
+  			\"label\": \"结束返回(return)\"
+  		}]
+  	},
+  	\"annotation_template\": {
+  		\"statement\": true,
+  		\"repeat\": true,
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"text\",
+  			\"label\": \"//\",
+  			\"value\": \" \"
+  		}, {
+  			\"type\": \"input\",
+  			\"label\": \"输入字符串\",
+  			\"length\": \"500\",
+  			\"dataType\": \"string\",
+  			\"validate\": \"^[a-zA-Z1-9_]$\",
+  			\"tip\": \"输入字符串，不能有特殊字符\"
+  		}]
+  	},
+  	\"debugPrint_template\": {
+  		\"statement\": true,
+  		\"repeat\": true,
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"text\",
+  			\"label\": \"debugPrint(\"
+  		}, {
+  		    \"type\":\"template\",
+  		    \"label\":\"输入debug信息\",
+  		    \"name\":\"string_template\"
+  		}, {
+  			\"type\": \"text\",
+  			\"label\": \")\"
+  		}]
+  	},
+  	\"code_block_template\": {
+  		\"statement\": true,
+  		\"repeat\": true,
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"text\",
+  			\"label\": \"<代码库>\"
+  		}]
+  	},
+  	\"varprocess_statement_template\": {
+  		\"type\": \"block\",
+  		\"lines\": [{
+  			\"repeat\": true,
+  			\"dropdown\": true,
+  			\"parts\": [{
+  				\"type\": \"placeholder\",
+  				\"label\": \"<添加语句>\",
+  				\"provider\": \"varprocess_statement_provider\"
+  			}]
+  		}]
+  	},
+  	\"assign_template\": {
+  		\"statement\": true,
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"text\",
+  			\"label\": \"变量赋值\",
+  			\"value\": \" \n \"
+  		},{
+  			\"type\": \"data\",
+  			\"label\": \"<左值选择>\",
+  			\"name\": \"data_provider_leftValue\",
+  			\"refresh\": \"0\"
+  		}, {
+  			\"type\": \"text\",
+  			\"label\": \"=\",
+  			\"value\": \"=\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<右值表达式>\",
+  			\"name\": \"\",
+  			\"refresh\": \"0\"
+  		},{
+  			\"type\": \"hidden\",
+  			\"value\": \" ;\n \"
+  		}
+  		]
+  	},
+  	\"object_assign_template\": {
+  		\"statement\": true,
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"text\",
+  			\"label\": \"对象赋值\",
+  			\"value\": \" \n \"
+  		},{
+  			\"type\": \"data\",
+  			\"label\": \"<对象选择>\",
+  			\"name\": \"data_provider_leftValue_object\",
+  			\"refresh\": \"0\"
+  		}, {
+  			\"type\": \"text\",
+  			\"label\": \"=\",
+  			\"value\": \"=\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<右值对象表达式>\",
+  			\"name\": \"\",
+  			\"refresh\": \"0\"
+  		},{
+  			\"type\": \"hidden\",
+  			\"value\": \" ;\n \"
+  		}]
+  	},
+  	\"array_assign_template\": {
+  		\"statement\": true,
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"text\",
+  			\"label\": \"数组赋值\",
+  			\"value\": \" \n \"
+  		},{
+  			\"type\": \"data\",
+  			\"label\": \"<数组选择>\",
+  			\"name\": \"data_provider_leftValue_array\",
+  			\"refresh\": \"0\"
+  		}, {
+  			\"type\": \"text\",
+  			\"label\": \"=\",
+  			\"value\": \"=\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<右值数组表达式>\",
+  			\"name\": \"\",
+  			\"refresh\": \"0\"
+  		},{
+  			\"type\": \"hidden\",
+  			\"value\": \" ;\n \"
+  		}]
+  	},
+  	\"array_add_template\": {
+  		\"statement\": true,
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"text\",
+  			\"label\": \"向数组添加对象\",
+  			\"value\": \" \n \"
+  		}, {
+  			\"type\": \"data\",
+  			\"label\": \"<选择一个数组>\",
+  			\"name\": \"data_provider_leftValue_array\",
+  			\"refresh\": \"0\"
+  		}, {
+  			\"type\": \"text\",
+  			\"label\": \"添加一个数据\",
+  			\"connect_operator\": true,
+  			\"connect_value\": \"add\",
+  			\"value\":\".add(\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<选择数据>\",
+  			\"name\": \"\",
+  			\"refresh\": \"0\"
+  		},{
+  			\"type\": \"hidden\",
+  			\"value\": \");\"
+  		}]
+  	},
+  	\"array_index_update_template\": {
+  		\"statement\": true,
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"text\",
+  			\"label\": \"数组指定下标更新对象\",
+  			\"value\": \" \n \"
+  		}, {
+  			\"type\": \"data\",
+  			\"label\": \"<选择一个数组>\",
+  			\"name\": \"data_provider_leftValue_array\",
+  			\"refresh\": \"0\"
+  		}, {
+  			\"type\": \"text\",
+  			\"label\": \"第\",
+  			\"connect_operator\": true,
+  			\"connect_value\": \"add\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<数值表达式>\",
+  			\"name\": \"number_template\"
+  		}, {
+  			\"type\": \"text\",
+  			\"label\": \"个元素\",
+  			\"dataType\":\"int\"
+  		}, {
+  			\"type\": \"text\",
+  			\"label\": \"更新数据\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<选择数据>\",
+  			\"name\": \"\",
+  			\"refresh\": \"0\"
+  		}]
+  	},
+  	\"array_loop_template\": {
+  		\"statement\": true,
+  		\"type\": \"block\",
+  		\"lines\": [{
+  			\"road\": true,
+  			\"parts\": [
+  			{
+  				\"type\": \"text\",
+  				\"label\": \"数组循环\"
+  			}, {
+  				\"type\": \"text\",
+  				\"label\": \"循环\",
+  				\"value\":\" \n for (def  temp_for_name\"
+  			}, {
+  				\"type\": \"hidden\",
+  				\"value\": \" : \"
+  			}, {
+  				\"type\": \"data\",
+  				\"label\": \"<选择一个数组>\",
+  				\"name\": \"data_provider_array\",
+  				\"newDynamicObject\": true
+  			}, {
+  				\"type\": \"hidden\",
+  				\"value\": \"){\"
+  			}]
+  		}, {
+  			\"repeat\": true,
+  			\"dropdown\": true,
+  			\"useDynamicObject\": true,
+  			\"parts\": [{
+  				\"type\": \"placeholder\",
+  				\"label\": \"<添加语句>\",
+  				\"provider\": \"while_statement_provider\"
+  			}]
+  		}, {
+  			\"parts\": [{
+  				\"type\": \"hidden\",
+  				\"value\": \"}\"
+  			}]
+  		}]
+  	},
+  	\"while_do_template\": {
+  		\"statement\": true,
+  		\"type\": \"block\",
+  		\"lines\": [{
+  			\"road\": true,
+  			\"parts\": [{
+  				\"type\": \"text\",
+  				\"label\": \"条件循环\"
+  			}, {
+  				\"type\": \"text\",
+  				\"label\": \"当满足\",
+  				\"value\": \" \n while(\"
+  			}, {
+  				\"type\": \"template\",
+  				\"label\": \"<逻辑表达式>\",
+  				\"name\": \"logic_template\"
+  			}, {
+  				\"type\": \"text\",
+  				\"label\": \"则循环执行\",
+  				\"value\": \") {\"
+  			}]
+  		}, {
+  			\"repeat\": true,
+  			\"dropdown\": true,
+  			\"marginLeft\": 42,
+  			\"parts\": [{
+  				\"type\": \"placeholder\",
+  				\"label\": \"<添加语句>\",
+  				\"provider\": \"while_statement_provider\"
+  			}]
+  		}, {
+  			\"parts\": [{
+  				\"type\": \"hidden\",
+  				\"value\": \"}\"
+  			}]
+  		}]
+  	},
+  	\"array_element_filter_template\": {
+  		\"statement\": true,
+  		\"type\": \"block\",
+  		\"lines\": [{
+  			\"road\": true,
+  			\"parts\": [
+  			{
+  				\"type\": \"text\",
+  				\"label\": \"数组筛选\"
+  			}, {
+  				\"type\": \"text\",
+  				\"label\": \"对\",
+  				\"value\":\" \n for (def  temp_for_name : \"
+  			}, {
+  				\"type\": \"data\",
+  				\"label\": \"<选择一个数组>\",
+  				\"name\": \"data_provider_array\",
+  				\"newDynamicObject\": true
+  			}, {
+  				\"type\": \"text\",
+  				\"label\": \"中 满足\",
+  				\"value\": \"){ \n if(\"
+  			}, {
+  				\"type\": \"template\",
+  				\"label\": \"<逻辑表达式>\",
+  				\"useDynamicObject\": true,
+  				\"name\": \"element_logic_template\"
+  			}, {
+  				\"type\": \"text\",
+  				\"label\": \"条件的元素执行\",
+  				\"value\":\") {\"
+  			}]
+  		}, {
+  			\"repeat\": true,
+  			\"dropdown\": true,
+  			\"useDynamicObject\": true,
+  			\"parts\": [{
+  				\"type\": \"placeholder\",
+  				\"label\": \"<选择操作>\",
+  				\"provider\": \"while_statement_provider\"
+  			}]
+  		}, {
+  			\"parts\": [{
+  				\"type\": \"hidden\",
+  				\"value\": \"}\"
+  			},{
+  				\"type\": \"hidden\",
+  				\"value\": \" \n }\"
+  			}]
+  		}]
+  	},
+  	\"if_then_template\": {
+  		\"statement\": true,
+  		\"extends\": true,
+  		\"type\": \"block\",
+  		\"lines\": [{
+  			\"stay\": true,
+  			\"parts\": [{
+  				\"type\": \"text\",
+  				\"label\": \"如果\",
+  				\"value\": \" \n if(\"
+  			}, {
+  				\"type\": \"template\",
+  				\"label\": \"<逻辑表达式>\",
+  				\"name\": \"logic_template\"
+  			}]
+  		}, {
+  			\"stay\": true,
+  			\"road\": true,
+  			\"parts\": [{
+  				\"type\": \"text\",
+  				\"label\": \"那么\",
+  				\"negativeLine\": true,
+  				\"value\": \") {\"
+  			}]
+  		}, {
+  			\"stay\": true,
+  			\"repeat\": true,
+  			\"dropdown\": true,
+  			\"marginLeft\": 42,
+  			\"parts\": [{
+  				\"type\": \"placeholder\",
+  				\"label\": \"<添加语句>\",
+  				\"provider\": \"statement_provider\"
+  			}]
+  		}, {
+  			\"stay\": true,
+  			\"parts\": [{
+  				\"type\": \"hidden\",
+  				\"value\": \" \n }\"
+  			},{
+  				\"type\": \"hidden\",
+  				\"value\": \" \n \"
+  			}]
+  		}]
+  	},
+  	\"if_then_else_template\": {
+  		\"statement\": true,
+  		\"extends\": true,
+  		\"type\": \"block\",
+  		\"lines\": [{
+  			\"stay\": true,
+  			\"parts\": [{
+  				\"type\": \"text\",
+  				\"label\": \"如果\",
+  				\"value\": \" \n if(\"
+  			}, {
+  				\"type\": \"template\",
+  				\"label\": \"<逻辑表达式>\",
+  				\"name\": \"logic_template\"
+  			}]
+  		}, {
+  			\"stay\": true,
+  			\"road\": true,
+  			\"parts\": [{
+  				\"type\": \"text\",
+  				\"label\": \"那么\",
+  				\"negativeLine\": true,
+  				\"value\": \") {\"
+  			}]
+  		}, {
+  			\"stay\": true,
+  			\"repeat\": true,
+  			\"dropdown\": true,
+  			\"marginLeft\": 42,
+  			\"parts\": [{
+  				\"type\": \"placeholder\",
+  				\"label\": \"<添加语句>\",
+  				\"provider\": \"statement_provider\"
+  			}]
+  		}, {
+  			\"road\": true,
+  			\"parts\": [{
+  				\"type\": \"text\",
+  				\"label\": \"否则\",
+  				\"negativeLine\": true,
+  				\"value\": \"} \n else {\"
+  			}]
+  		}, {
+  			\"repeat\": true,
+  			\"dropdown\": true,
+  			\"parts\": [{
+  				\"type\": \"placeholder\",
+  				\"label\": \"<添加语句>\",
+  				\"provider\": \"statement_provider\"
+  			}]
+  		},  {
+  			\"stay\": true,	
+  			\"parts\": [{
+  				\"type\": \"hidden\",
+  				\"value\": \"\n }\"
+  			},{
+  				\"type\": \"hidden\",
+  				\"value\": \" \n \"
+  			}]
+  		}]
+  	},
+  	\"if_then_while_template\": {
+  		\"statement\": true,
+  		\"type\": \"block\",
+  		\"extends\": true,
+  		\"lines\": [{
+  			\"stay\": true,
+  			\"parts\": [{
+  				\"type\": \"text\",
+  				\"label\": \"如果\",
+  				\"value\": \" \n if(\"
+  			}, {
+  				\"type\": \"template\",
+  				\"label\": \"<逻辑表达式>\",
+  				\"name\": \"logic_template\"
+  			}]
+  		}, {
+  			\"stay\": true,
+  			\"road\": true,
+  			\"parts\": [{
+  				\"type\": \"text\",
+  				\"label\": \"	 那么\",
+  				\"negativeLine\": true,
+  				\"value\": \") {\"
+  			}]
+  		}, {
+  			\"stay\": true,
+  			\"repeat\": true,
+  			\"dropdown\": true,
+  			\"marginLeft\": 42,
+  			\"parts\": [{
+  				\"type\": \"placeholder\",
+  				\"label\": \"<添加语句>\",
+  				\"provider\": \"if_then_while_statement_provider\"
+  			}]
+  		}, {
+  			\"stay\": true,
+  			\"parts\": [{
+  				\"type\": \"hidden\",
+  				\"value\": \"}\"
+  			},{
+  				\"type\": \"hidden\",
+  				\"value\": \" \n \"
+  			}]
+  		}]
+  	},
+  	\"if_then_else_while_template\": {
+  		\"statement\": true,
+  		\"type\": \"block\",
+  		\"extends\": true,
+  		\"lines\": [{
+  			\"stay\": true,
+  			\"parts\": [{
+  				\"type\": \"text\",
+  				\"label\": \"如果\",
+  				\"value\": \" \n if(\"
+  			}, {
+  				\"type\": \"template\",
+  				\"label\": \"<逻辑表达式>\",
+  				\"name\": \"logic_template\"
+  			}]
+  		}, {
+  			\"stay\": true,
+  			\"road\": true,
+  			\"parts\": [{
+  				\"type\": \"text\",
+  				\"label\": \"那么\",
+  				\"negativeLine\": true,
+  				\"value\": \") {\"
+  			}]
+  		}, {
+  			\"stay\": true,
+  			\"repeat\": true,
+  			\"dropdown\": true,
+  			\"marginLeft\": 42,
+  			\"parts\": [{
+  				\"type\": \"placeholder\",
+  				\"label\": \"<添加语句>\",
+  				\"provider\": \"if_then_while_statement_provider\"
+  			}]
+  		}, {
+  			\"road\": true,
+  			\"parts\": [{
+  				\"type\": \"text\",
+  				\"label\": \"否则\",
+  				\"negativeLine\": true,
+  				\"value\": \"} \n else {\"
+  			}]
+  		}, {
+  			\"repeat\": true,
+  			\"dropdown\": true,
+  			\"parts\": [{
+  				\"type\": \"placeholder\",
+  				\"label\": \"<添加语句>\",
+  				\"provider\": \"if_then_while_statement_provider\"
+  			}]
+  		},  {
+  			\"stay\": true,
+  			\"parts\": [{
+  				\"type\": \"hidden\",
+  				\"value\": \"\n }\"
+  			},{
+  				\"type\": \"hidden\",
+  				\"value\": \" \n \"
+  			}]
+  		}]
+  	},
+  	\"logic_template\": {
+  		\"type\": \"part\",
+  		\"connect\": true,
+  		\"connect_operators\": [{
+  			\"label\": \"and\",
+  			\"value\": \"&&\"
+  		}, {
+  			\"label\": \"or\",
+  			\"value\": \"||\"
+  		}, {
+  			\"label\": \"删除\",
+  			\"value\": \"DEL\"
+  		}],
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<逻辑表达式>\",
+  			\"provider\": \"logic_provider\"
+  		}]
+  	},
+  	\"out_logic_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<逻辑表达式>\",
+  			\"provider\": \"out_logic_provider\"
+  		}]
+  	},
+  	\"element_logic_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"template\",
+  			\"label\": \"<逻辑表达式>\",
+  			\"name\": \"logic_template\",
+  			\"constraint\":\"element_attr\"
+  		}]
+  	},
+  	\"regx_logic_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"template\",
+  			\"label\": \"<字符串表达式>\",
+  			\"name\": \"string_template\"
+  		}, {
+  			\"type\": \"text\",
+  			\"label\": \"正则匹配\",
+  			\"value\": \"matches\"
+  		}, {
+  			\"type\": \"input\",
+  			\"label\": \"输入正则表达式\",
+  			\"length\": \"20\",
+  			\"datatype\": \"string\",
+  			\"validate\": \"^^[a-zA-Z1-9_]$$\",
+  			\"tip\": \"请输入正则表达式\"
+  		}]
+  	},
+  	\"paren_logic_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"text\",
+  			\"label\": \"(\",
+  			\"value\": \"(\"
+  		}, {
+  			\"type\": \"template\",
+  			\"name\": \"logic_template\"
+  		}, {
+  			\"type\": \"text\",
+  			\"label\": \")\",
+  			\"value\": \")\"
+  		}]
+  	},
+  	\"number_logic_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"template\",
+  			\"label\": \"<数值表达式>\",
+  			\"name\": \"number_template\"
+  		}, {
+  			\"type\": \"list\",
+  			\"items\": [{
+  				\"label\": \"大于\",
+  				\"value\": \">\"
+  			}, {
+  				\"label\": \"大于等于\",
+  				\"value\": \">=\"
+  			}, {
+  				\"label\": \"小于\",
+  				\"value\": \"<\"
+  			}, {
+  				\"label\": \"小于等于\",
+  				\"value\": \"<=\"
+  			}, {
+  				\"label\": \"等于\",
+  				\"value\": \"==\"
+  			}, {
+  				\"label\": \"不等于\",
+  				\"value\": \"!=\"
+  			}, {
+  				\"label\": \"在集合\",
+  				\"value\": \"in\",
+  				\"template\": \"array_number_template\"
+  			}, {
+  				\"label\": \"不在集合中\",
+  				\"value\": \"notin\",
+  				\"template\": \"array_number_template\"
+  			}]
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<数值表达式>\",
+  			\"name\": \"number_template\"
+  		}]
+  	},
+  	\"string_logic_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"template\",
+  			\"label\": \"<字符串表达式>\",
+  			\"name\": \"string_template\"
+  		}, {
+  			\"type\": \"list\",
+  			\"items\": [{
+  				\"label\": \"等于\",
+  				\"value\": \"equal\"
+  			}, {
+  				\"label\": \"等于(不区分大小写)\",
+  				\"value\": \"equals\"
+  			}, {
+  				\"label\": \"不等于\",
+  				\"value\": \"notequal\"
+  			}, {
+  				\"label\": \"在集合\",
+  				\"value\": \"in\",
+  				\"template\": \"array_string_template\"
+  			}, {
+  				\"label\": \"不在集合\",
+  				\"value\": \"notin\",
+  				\"template\": \"array_string_template\"
+  			}, {
+  				\"label\": \"开始于\",
+  				\"value\": \"start\"
+  			}, {
+  				\"label\": \"不开始于\",
+  				\"value\": \"notstart\"
+  			}, {
+  				\"label\": \"结束于\",
+  				\"value\": \"end\"
+  			}, {
+  				\"label\": \"不结束于\",
+  				\"value\": \"notend\"
+  			}, {
+  				\"label\": \"包含\",
+  				\"value\": \"include\"
+  			}, {
+  				\"label\": \"不包含\",
+  				\"value\": \"notinclude\"
+  			}, {
+  				\"label\": \"包含任意元素\",
+  				\"value\": \"includeEle\",
+  				\"template\": \"array_string_template\"
+  			}, {
+  				\"label\": \"不包含所有元素\",
+  				\"value\": \"notincludeEle\",
+  				\"template\": \"array_string_template\"
+  			}]
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<字符串表达式>\",
+  			\"name\": \"string_template\"
+  		}]
+  	},
+  	\"date_logic_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"template\",
+  			\"label\": \"<一个日期>\",
+  			\"name\": \"date_template\"
+  		}, {
+  			\"type\": \"list\",
+  			\"items\": [{
+  				\"label\": \"大于\",
+  				\"value\": \">\"
+  			}, {
+  				\"label\": \"大于等于\",
+  				\"value\": \">=\"
+  			}, {
+  				\"label\": \"小于\",
+  				\"value\": \"<\"
+  			}, {
+  				\"label\": \"小于等于\",
+  				\"value\": \"<=\"
+  			}, {
+  				\"label\": \"等于\",
+  				\"value\": \"equal\"
+  			}, {
+  				\"label\": \"不等于\",
+  				\"value\": \"notequal\"
+  			}]
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<一个日期>\",
+  			\"name\": \"date_template\"
+  		}]
+  	},
+  	\"not_logic_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"text\",
+  			\"label\": \"not\",
+  			\"value\": \"!\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<逻辑表达式>\",
+  			\"name\": \"logic_template\"
+  		}]
+  	},
+  	\"not_paren_logic_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"text\",
+  			\"label\": \"not\",
+  			\"value\": \"!\"
+  		}, {
+  			\"type\": \"template\",
+  			\"name\": \"paren_logic_template\"
+  		}]
+  	},
+  	\"number_template\": {
+  		\"type\": \"part\",
+  		\"connect\": true,
+  		\"connect_operators\": [{
+  			\"label\": \"+\",
+  			\"value\": \"+\"
+  		}, {
+  			\"label\": \"-\",
+  			\"value\": \"-\"
+  		}, {
+  			\"label\": \"×\",
+  			\"value\": \"*\"
+  		}, {
+  			\"label\": \"÷\",
+  			\"value\": \"/\"
+  		}, {
+  			\"label\": \"删除\",
+  			\"value\": \"DEL\"
+  		}],
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<数值表达式>\",
+  			\"useParentPlaceholder\": true,
+  			\"provider\": \"number_provider\"
+  		}]
+  	},
+  	\"out_number_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<数值表达式>\",
+  			\"useParentPlaceholder\": true,
+  			\"provider\": \"out_number_provider\"
+  		}]
+  	},
+  	\"paren_number_expr_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"text\",
+  			\"label\": \"(\",
+  			\"value\": \"(\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<数值表达式>\",
+  			\"useParentPlaceholder\": true,
+  			\"name\": \"number_template\"
+  		}, {
+  			\"type\": \"text\",
+  			\"label\": \")\",
+  			\"value\": \")\"
+  		}]
+  	},
+  	\"string_template\": {
+  		\"type\": \"part\",
+  		\"connect\": true,
+  		\"connect_operators\": [{
+  			\"label\": \"+\",
+  			\"value\": \"+\"
+  		}, {
+  			\"label\": \"删除\",
+  			\"value\": \"DEL\"
+  		}],
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<字符串表达式>\",
+  			\"useParentPlaceholder\": true,
+  			\"provider\": \"string_provider\"
+  		}]
+  	},
+  	\"out_string_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<字符串表达式>\",
+  			\"useParentPlaceholder\": true,
+  			\"provider\": \"out_string_provider\"
+  		}]
+  	},
+  	\"multi_string_template\": {
+  		\"type\": \"part\",
+  		\"connect\": true,
+  		\"connect_operators\": [{
+  			\"label\": \",\",
+  			\"value\": \",\"
+  		}, {
+  			\"label\": \"删除\",
+  			\"value\": \"DEL\"
+  		}],
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<字符串表达式>\",
+  			\"useParentPlaceholder\": true,
+  			\"provider\": \"string_provider\"
+  		}]
+  	},
+  	\"multi_number_template\": {
+  		\"type\": \"part\",
+  		\"connect\": true,
+  		\"connect_operators\": [{
+  			\"label\": \",\",
+  			\"value\": \",\"
+  		}, {
+  			\"label\": \"删除\",
+  			\"value\": \"DEL\"
+  		}],
+  		\"parts\": [{
+  			\"type\": \"hidden\",
+  			\"value\": \"new Double(\"
+  		},{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<数值表达式>\",
+  			\"provider\": \"number_provider\"
+  		},{
+  			\"type\": \"hidden\",
+  			\"value\": \")\"
+  		}]
+  	},
+  	\"multi_date_template\": {
+  		\"type\": \"part\",
+  		\"connect\": true,
+  		\"connect_operators\": [{
+  			\"label\": \",\",
+  			\"value\": \",\"
+  		}, {
+  			\"label\": \"删除\",
+  			\"value\": \"DEL\"
+  		}],
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<日期表达式>\",
+  			\"useParentPlaceholder\": true,
+  			\"provider\": \"date_provider\"
+  		}]
+  	},
+  	\"multi_bool_template\": {
+  		\"type\": \"part\",
+  		\"connect\": true,
+  		\"connect_operators\": [{
+  			\"label\": \",\",
+  			\"value\": \",\"
+  		}, {
+  			\"label\": \"删除\",
+  			\"value\": \"DEL\"
+  		}],
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<布尔表达式>\",
+  			\"useParentPlaceholder\": true,
+  			\"provider\": \"logic_provider\"
+  		}]
+  	},
+  	\"date_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<一个日期>\",
+  			\"provider\": \"date_provider\"
+  		}]
+  	},
+  	\"out_date_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<一个日期>\",
+  			\"provider\": \"out_date_provider\"
+  		}]
+  	},
+  	\"object_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<对象表达式>\",
+  			\"provider\": \"object_provider\"
+  		}]
+  	},
+  	\"array_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<数组表达式>\",
+  			\"provider\": \"array_provider\"
+  		}]
+  	},
+  	\"opt_object_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<对象表达式>\",
+  			\"provider\": \"opt_object_provider\"
+  		}]
+  	},
+  	\"whole_object_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<对象表达式>\",
+  			\"provider\": \"whole_object_provider\"
+  		}]
+  	},
+  	\"opt_object_array_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<对象数组表达式>\",
+  			\"provider\": \"opt_object_array_provider\"
+  		}]
+  	},
+  	\"array_object_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<对象数组表达式>\",
+  			\"useParentPlaceholder\": true,
+  			\"provider\": \"array_object_provider\"
+  		}]
+  	},
+  	\"array_string_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<字符串数组表达式>\",
+  			\"provider\": \"array_string_provider\"
+  		}]
+  	},
+  	\"array_number_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<数值数组表达式>\",
+  			\"provider\": \"array_number_provider\"
+  		}]
+  	},
+  	\"array_logic_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<布尔数组表达式>\",
+  			\"provider\": \"array_bool_provider\"
+  		}]
+  	},
+  	\"array_date_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<日期数组表达式>\",
+  			\"provider\": \"array_date_provider\"
+  		}]
+  	},
+  	\"out_array_string_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<字符串数组表达式>\",
+  			\"provider\": \"out_array_string_provider\"
+  		}]
+  	},
+  	\"out_array_number_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<数值数组表达式>\",
+  			\"provider\": \"out_array_number_provider\"
+  		}]
+  	},
+  	\"out_array_logic_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<布尔数组表达式>\",
+  			\"provider\": \"out_array_bool_provider\"
+  		}]
+  	},
+  	\"out_array_date_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<日期数组表达式>\",
+  			\"provider\": \"out_array_date_provider\"
+  		}]
+  	},
+  	\"string_collection_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"text\",
+  			\"label\": \"(\",
+  			\"value\": \"[\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<字符串表达式> 添加选择\",
+  			\"name\": \"multi_string_template\"
+  		}, {
+  		    \"type\":\"text\",
+  			\"label\":\")\",
+  		    \"value\":\"]\"
+  		}]
+  	},
+  	\"number_collection_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"text\",
+  			\"label\": \"(\",
+  			\"value\": \"[\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<数值表达式> 添加选择\",
+  			\"name\": \"multi_number_template\"
+  		}, {
+  		    \"type\":\"text\",
+  			\"label\":\")\",
+  		    \"value\":\"]\"
+  		}]
+  	},
+  	\"date_collection_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"text\",
+  			\"label\": \"(\",
+  			\"value\": \"[\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<日期表达式> 添加选择\",
+  			\"name\": \"multi_date_template\"
+  		}, {
+  		    \"type\":\"text\",
+  			\"label\":\")\",
+  		    \"value\":\"]\"
+  		}]
+  	},
+  	\"bool_collection_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"text\",
+  			\"label\": \"(\",
+  			\"value\": \"[\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<布尔表达式> 添加选择\",
+  			\"name\": \"multi_bool_template\"
+  		}, {
+  		    \"type\":\"text\",
+  			\"label\":\")\",
+  		    \"value\":\"]\"
+  		}]
+  	},
+  	\"exception_value_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"data\",
+              \"name\": \"data_provider_exception_value\",
+  			\"useParentPlaceholder\": true,
+              \"label\": \"异常值\"
+  		}]
+  	},
+  	\"dict_value_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"data\",
+              \"name\": \"data_provider_dict_value\",
+  			\"useParentPlaceholder\": true,
+              \"label\": \"选择字典\"
+  		}]
+  	},
+  	\"function_number_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<数值函数>\",
+  			\"provider\": \"function_provider_number\"
+  		}]
+  	},
+      \"function_string_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<字符串函数>\",
+  			\"provider\": \"function_provider_string\"
+  		}]
+  	},
+      \"function_bool_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<布尔函数>\",
+  			\"provider\": \"function_provider_bool\"
+  		}]
+  	},
+      \"function_date_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<日期函数>\",
+  			\"provider\": \"function_provider_date\"
+  		}]
+  	},
+  	\"function_array_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<数组函数>\",
+  			\"provider\": \"function_provider_array\"
+  		}]
+  	},
+  	\"function_object_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<对象函数>\",
+  			\"provider\": \"function_provider_object\"
+  		}]
+  	},
+  	\"function_array_object_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<对象数组函数>\",
+  			\"provider\": \"function_provider_array_object\"
+  		}]
+  	},
+  	\"function_array_string_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<字符串数组函数>\",
+  			\"provider\": \"function_provider_array_string\"
+  		}]
+  	},
+  	\"function_array_number_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<数值数组函数>\",
+  			\"provider\": \"function_provider_array_number\"
+  		}]
+  	},
+  	\"function_array_date_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<日期数组函数>\",
+  			\"provider\": \"function_provider_array_date\"
+  		}]
+  	},
+  	\"function_array_bool_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<布尔数组函数>\",
+  			\"provider\": \"function_provider_array_bool\"
+  		}]
+  	},
+  	\"function_common_template\": {
+  		\"statement\": true,
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<变量模板>\",
+  			\"useParentPlaceholder\": true,
+  			\"provider\": \"function_common_provider\"
+  		}]
+  	},
+  	\"function_common_string_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<字符串变量模板>\",
+  			\"useParentPlaceholder\": true,
+  			\"provider\": \"function_common_provider_string\"
+  		}]
+  	},
+  	\"function_common_number_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<数值变量模板>\",
+  			\"useParentPlaceholder\": true,
+  			\"provider\": \"function_common_provider_number\"
+  		}]
+  	},
+  	\"function_common_date_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<日期变量模板>\",
+  			\"useParentPlaceholder\": true,
+  			\"provider\": \"function_common_provider_date\"
+  		}]
+  	},
+  	\"function_common_bool_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<布尔变量模板>\",
+  			\"useParentPlaceholder\": true,
+  			\"provider\": \"function_common_provider_bool\"
+  		}]
+  	},
+  	\"sort_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<排序>\",
+  			\"provider\": \"sort_provider\"
+  		}]
+  	},
+  	\"sort_provider\": {
+  		\"type\": \"list\",
+  		\"items\": [{
+  			\"type\": \"text\",
+  			\"label\": \"升序\",
+  			\"value\": \"asc\"
+  		}, {
+  			\"type\": \"text\",
+  			\"label\": \"降序\",
+  			\"value\": \"desc\"
+  		}, {
+  			\"type\": \"reset\",
+              \"label\": \"清除\"
+  		}]
+  	},
+  	\"condition_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<条件>\",
+  			\"provider\": \"condition_provider\"
+  		}]
+  	},
+  	\"condition_provider\": {
+  		\"type\": \"list\",
+  		\"items\": [{
+  			\"type\": \"text\",
+  			\"label\": \"大于\",
+  			\"value\": \">\"
+  		}, {
+  			\"type\": \"text\",
+  			\"label\": \"大于等于\",
+  			\"value\": \">=\"
+  		}, {
+  			\"type\": \"text\",
+  			\"label\": \"小于\",
+  			\"value\": \"<\"
+  		}, {
+  			\"type\": \"text\",
+  			\"label\": \"小于等于\",
+  			\"value\": \"<=\"
+  		}, {
+  			\"type\": \"text\",
+  			\"label\": \"等于\",
+  			\"value\": \"==\"
+  		}, {
+  			\"type\": \"text\",
+  			\"label\": \"不等于\",
+  			\"value\": \"!=\"
+  		}, {
+  			\"type\": \"reset\",
+              \"label\": \"清除\"
+  		}]
+  	},
+  	\"logic_provider\": {
+  		\"type\": \"list\",
+  		\"items\": [{
+  			\"type\": \"template\",
+  			\"label\": \"<字符串逻辑表达式>\",
+  			\"name\": \"string_logic_template\" 
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<数值逻辑表达式>\",
+  			\"name\": \"number_logic_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<日期逻辑表达式>\",
+  			\"name\": \"date_logic_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"(<逻辑表达式>)\",
+  			\"name\": \"paren_logic_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"not <逻辑表达式>\",
+  			\"name\": \"not_logic_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"not (<逻辑表达式>)\",
+  			\"name\": \"not_paren_logic_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<布尔函数>\",
+  			\"name\": \"function_bool_template\"
+  		}, {
+  			\"type\": \"data\",
+  			\"label\": \"布尔变量\",
+  			\"name\": \"data_provider_bool\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<正则匹配逻辑表达式>\",
+  			\"name\": \"regx_logic_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"布尔异常值\",
+  			\"dataType\": \"boolean\",
+  			\"name\": \"exception_value_template\"
+  		}, {
+  			\"type\": \"text\",
+  			\"label\": \"true\",
+  			\"value\": true
+  		}, {
+  			\"type\": \"text\",
+  			\"label\": \"false\",
+  			\"value\": false
+  		}, {
+  			\"type\": \"reset\",
+              \"label\": \"清除\"
+  		}]
+  	},
+  	\"number_provider\": {
+  		\"type\": \"list\",
+  		\"items\": [{
+  			\"type\": \"input\",
+  			\"label\": \"输入数值\",
+  			\"length\": \"15\",
+  			\"dataType\": \"number\",
+  			\"validate\": \"^-?[1-9]\\\\d*$|^-?([1-9]\\\\d*\\\\.\\\\d*|0\\\\.\\\\d*[1-9]\\\\d*|0?\\\\.0+|0)$\",
+  			\"tip\": \"输入整数或小数\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"选择字典\",
+  			\"name\": \"dict_value_template\"
+  		}, {
+  			\"type\": \"data\",
+  			\"label\": \"数值变量\",
+  			\"name\": \"data_provider_number\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"(<数值表达式>)\",
+  			\"name\": \"paren_number_expr_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"数值异常值\",
+  			\"name\": \"exception_value_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<数值函数>\",
+  			\"name\": \"function_number_template\"
+  		}, {
+  			\"type\": \"reset\",
+              \"label\": \"清除\"
+  		}]
+  	},
+  	\"string_provider\": {
+  		\"type\": \"list\",
+  		\"items\": [{
+  			\"type\": \"input\",
+  			\"label\": \"输入字符串\",
+  			\"length\": \"15\",
+  			\"dataType\": \"string\",
+  			\"validate\": \"^[a-zA-Z1-9_]$\",
+  			\"tip\": \"输入字符串，不能有特殊字符\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"选择字典\",
+  			\"name\": \"dict_value_template\"
+  		}, {
+  			\"type\": \"data\",
+  			\"label\": \"字符串变量\",
+  			\"name\": \"data_provider_string\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"字符串异常值\",
+  			\"name\": \"exception_value_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<字符串函数>\",
+  			\"name\": \"function_string_template\"
+  		}, {
+  			\"type\": \"reset\",
+              \"label\": \"清除\"
+  		}]
+  	},
+  	\"date_provider\": {
+  		\"type\": \"list\",
+  		\"items\": [{
+  			\"type\": \"date\",
+  			\"transType\": \"year\",
+  			\"dataType\": \"date\",
+  			\"label\": \"选择年份\"
+  		},
+  		{
+  			\"type\": \"date\",
+  			\"transType\": \"month\",
+  			\"dataType\": \"date\",
+  			\"label\": \"选择月份\"
+  		},
+  		{
+  			\"type\": \"date\",
+  			\"transType\": \"date\",
+  			\"dataType\": \"date\",
+  			\"label\": \"选择日期\"
+  		},
+  		{
+  			\"type\": \"date\",
+  			\"transType\": \"datetime\",
+  			\"dataType\": \"datetime\",
+  			\"label\": \"选择时间\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"选择字典\",
+  			\"name\": \"dict_value_template\"
+  		}, {
+  			\"type\": \"data\",
+  			\"label\": \"日期变量\",
+  			\"name\": \"data_provider_date\"
+  		}, 
+  		{
+  			\"type\": \"template\",
+  			\"label\": \"日期异常值\",
+  			\"name\": \"exception_value_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<日期函数>\",
+  			\"name\": \"function_date_template\"
+  		}, {
+  			\"type\": \"reset\",
+              \"label\": \"清除\"
+  		}]
+  	},
+  	\"out_logic_provider\": {
+  		\"type\": \"list\",
+  		\"items\": [{
+  			\"type\": \"data\",
+  			\"label\": \"布尔变量\",
+  			\"name\": \"data_provider_bool\"
+  		}, {
+  			\"type\": \"reset\",
+              \"label\": \"清除\"
+  		}]
+  	},
+  	\"out_number_provider\": {
+  		\"type\": \"list\",
+  		\"items\": [{
+  			\"type\": \"data\",
+  			\"label\": \"数值变量\",
+  			\"name\": \"data_provider_number\"
+  		}, {
+  			\"type\": \"reset\",
+              \"label\": \"清除\"
+  		}]
+  	},
+  	\"out_string_provider\": {
+  		\"type\": \"list\",
+  		\"items\": [{
+  			\"type\": \"data\",
+  			\"label\": \"字符串变量\",
+  			\"name\": \"data_provider_string\"
+  		}, {
+  			\"type\": \"reset\",
+              \"label\": \"清除\"
+  		}]
+  	},
+  	\"out_date_provider\": {
+  		\"type\": \"list\",
+  		\"items\": [{
+  			\"type\": \"data\",
+  			\"label\": \"日期变量\",
+  			\"name\": \"data_provider_date\"
+  		},{
+  			\"type\": \"reset\",
+              \"label\": \"清除\"
+  		}]
+  	},
+  	\"array_provider\": {
+  		\"type\": \"list\",
+  		\"items\": [{
+  			\"type\": \"data\",
+  			\"label\": \"<选择一个数组>\",
+  			\"name\": \"data_provider_array\",
+  			\"refresh\": \"0\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<数组函数>\",
+  			\"name\": \"function_array_template\"
+  		}, {
+  			\"type\": \"reset\",
+              \"label\": \"清除\"
+  		}]
+  	},
+  	\"object_provider\": {
+  		\"type\": \"list\",
+  		\"items\": [{
+  			\"type\": \"template\",
+  			\"label\": \"输入对象\",
+  			\"flat\": true,
+  			\"name\": \"\"
+  		}, {
+  			\"type\": \"data\",
+  			\"label\": \"选择对象\",
+  			\"cascading_object_flag\": true,
+  			\"name\": \"data_provider_object\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<对象函数>\",
+  			\"name\": \"function_object_template\"
+  		}, {
+  			\"type\": \"reset\",
+              \"label\": \"清除\"
+  		}]
+  	},
+  	\"opt_object_provider\": {
+  		\"type\": \"list\",
+  		\"items\": [{
+  			\"type\": \"data\",
+  			\"label\": \"选择对象\",
+  			\"cascading_object_flag\": true,
+  			\"name\": \"data_provider_object\"
+  		}, {
+  			\"type\": \"reset\",
+              \"label\": \"清除\"
+  		}]
+  	},
+  	\"whole_object_provider\": {
+  		\"type\": \"list\",
+  		\"items\": [{
+  			\"type\": \"data\",
+  			\"label\": \"选择对象\",
+  			\"name\": \"data_provider_object\"
+  		}, {
+  			\"type\": \"reset\",
+              \"label\": \"清除\"
+  		}]
+  	},
+  	\"opt_object_array_provider\": {
+  		\"type\": \"list\",
+  		\"items\": [{
+  			\"type\": \"data\",
+  			\"label\": \"选择对象数组\",
+  			\"cascading_object_flag\": true,
+  			\"name\": \"data_provider_array_object\"
+  		}, {
+  			\"type\": \"reset\",
+              \"label\": \"清除\"
+  		}]
+  	},
+  	\"array_object_provider\": {
+  		\"type\": \"list\",
+  		\"items\": [{
+  			\"type\": \"data\",
+  			\"label\": \"选择对象数组\",
+  			\"cascading_object_flag\": true,
+  			\"name\": \"data_provider_array_object\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<对象数组函数>\",
+  			\"name\": \"function_array_object_template\"
+  		}, {
+  			\"type\": \"reset\",
+              \"label\": \"清除\"
+  		}]
+  	},
+  	\"array_string_provider\": {
+  		\"type\": \"list\",
+  		\"items\": [{
+  			\"type\": \"data\",
+  			\"label\": \"字符串数组变量\",
+  			\"name\": \"data_provider_array_string\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"(<字符串表达式> 添加选择)\",
+  			\"name\": \"string_collection_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<字符串数组函数>\",
+  			\"name\": \"function_array_string_template\"
+  		}, {
+  			\"type\": \"reset\",
+              \"label\": \"清除\"
+  		}]
+  	},
+  	\"array_number_provider\": {
+  		\"type\": \"list\",
+  		\"items\": [{
+  			\"type\": \"data\",
+  			\"label\": \"数值数组变量\",
+  			\"name\": \"data_provider_array_number\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"(<数值表达式> 添加选择)\",
+  			\"name\": \"number_collection_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<数值数组函数>\",
+  			\"name\": \"function_array_number_template\"
+  		}, {
+  			\"type\": \"reset\",
+              \"label\": \"清除\"
+  		}]
+  	},
+  	\"array_date_provider\": {
+  		\"type\": \"list\",
+  		\"items\": [{
+  			\"type\": \"data\",
+  			\"label\": \"日期数组变量\",
+  			\"name\": \"data_provider_array_date\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"(<日期表达式> 添加选择)\",
+  			\"name\": \"date_collection_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<日期数组函数>\",
+  			\"name\": \"function_array_date_template\"
+  		}, {
+  			\"type\": \"reset\",
+              \"label\": \"清除\"
+  		}]
+  	},
+  	\"array_bool_provider\": {
+  		\"type\": \"list\",
+  		\"items\": [{
+  			\"type\": \"data\",
+  			\"label\": \"布尔数组变量\",
+  			\"name\": \"data_provider_array_bool\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"(<布尔表达式> 添加选择)\",
+  			\"name\": \"bool_collection_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<布尔数组函数>\",
+  			\"name\": \"function_array_bool_template\"
+  		}, {
+  			\"type\": \"reset\",
+              \"label\": \"清除\"
+  		}]
+  	},
+  	\"out_array_string_provider\": {
+  		\"type\": \"list\",
+  		\"items\": [{
+  			\"type\": \"data\",
+  			\"label\": \"字符串数组变量\",
+  			\"name\": \"data_provider_array_string\"
+  		}, {
+  			\"type\": \"reset\",
+              \"label\": \"清除\"
+  		}]
+  	},
+  	\"out_array_number_provider\": {
+  		\"type\": \"list\",
+  		\"items\": [{
+  			\"type\": \"data\",
+  			\"label\": \"数值数组变量\",
+  			\"name\": \"data_provider_array_number\"
+  		}, {
+  			\"type\": \"reset\",
+              \"label\": \"清除\"
+  		}]
+  	},
+  	\"out_array_date_provider\": {
+  		\"type\": \"list\",
+  		\"items\": [{
+  			\"type\": \"data\",
+  			\"label\": \"日期数组变量\",
+  			\"name\": \"data_provider_array_date\"
+  		}, {
+  			\"type\": \"reset\",
+              \"label\": \"清除\"
+  		}]
+  	},
+  	\"out_array_bool_provider\": {
+  		\"type\": \"list\",
+  		\"items\": [{
+  			\"type\": \"data\",
+  			\"label\": \"布尔数组变量\",
+  			\"name\": \"data_provider_array_bool\"
+  		}, {
+  			\"type\": \"reset\",
+              \"label\": \"清除\"
+  		}]
+  	},
+  	\"if_then_while_statement_provider\": {
+  		\"type\": \"list\",
+  		\"items\": [{
+  			\"type\": \"template\",
+  			\"label\": \"<变量赋值>\",
+  			\"name\": \"assign_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<对象赋值>\",
+  			\"name\": \"object_assign_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<数组赋值>\",
+  			\"name\": \"array_assign_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<如果...那么...>\",
+  			\"name\": \"if_then_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<如果...那么...否则...>\",
+  			\"name\": \"if_then_else_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<条件循环>\",
+  			\"name\": \"while_do_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<数组循环>\",
+  			\"name\": \"array_loop_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<数组元素筛选>\",
+  			\"name\": \"array_element_filter_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<向数组添加对象>\",
+  			\"name\": \"array_add_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<指定下标更新数组对象>\",
+  			\"name\": \"array_index_update_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<代码库>\",
+  			\"name\": \"code_block_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"debugPrint\",
+  			\"name\": \"debugPrint_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"注释\",
+  			\"name\": \"annotation_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<继续循环>\",
+  			\"name\": \"continue_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<跳出循环>\",
+  			\"name\": \"break_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"结束返回(return)\",
+  			\"name\": \"return_template\"
+  		}, {
+  			\"type\": \"reset\",
+              \"label\": \"清除\"
+  		}]
+  	},
+  	\"statement_provider\": {
+  		\"type\": \"list\",
+  		\"items\": [{
+  			\"type\": \"template\",
+  			\"label\": \"<变量赋值>\",
+  			\"name\": \"assign_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<对象赋值>\",
+  			\"name\": \"object_assign_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<数组赋值>\",
+  			\"name\": \"array_assign_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<如果...那么...>\",
+  			\"name\": \"if_then_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<如果...那么...否则...>\",
+  			\"name\": \"if_then_else_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<条件循环>\",
+  			\"name\": \"while_do_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<数组循环>\",
+  			\"name\": \"array_loop_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<数组元素筛选>\",
+  			\"name\": \"array_element_filter_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<向数组添加对象>\",
+  			\"name\": \"array_add_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<指定下标更新数组对象>\",
+  			\"name\": \"array_index_update_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<代码库>\",
+  			\"name\": \"code_block_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"debugPrint\",
+  			\"name\": \"debugPrint_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"注释\",
+  			\"name\": \"annotation_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"结束返回(return)\",
+  			\"name\": \"return_template\"
+  		}, {
+  			\"type\": \"reset\",
+              \"label\": \"清除\"
+  		}]
+  	},
+
+  	\"while_statement_provider\": {
+  		\"type\": \"list\",
+  		\"items\": [{
+  			\"type\": \"template\",
+  			\"label\": \"<变量赋值>\",
+  			\"name\": \"assign_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<对象赋值>\",
+  			\"name\": \"object_assign_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<数组赋值>\",
+  			\"name\": \"array_assign_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<如果...那么...>\",
+  			\"name\": \"if_then_while_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<如果...那么...否则...>\",
+  			\"name\": \"if_then_else_while_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<条件循环>\",
+  			\"name\": \"while_do_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<数组循环>\",
+  			\"name\": \"array_loop_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<数组元素筛选>\",
+  			\"name\": \"array_element_filter_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<向数组添加对象>\",
+  			\"name\": \"array_add_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<指定下标更新数组对象>\",
+  			\"name\": \"array_index_update_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<代码库>\",
+  			\"name\": \"code_block_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"debugPrint\",
+  			\"name\": \"debugPrint_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"注释\",
+  			\"name\": \"annotation_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"结束返回(return)\",
+  			\"name\": \"return_template\"
+  		}, {
+  			\"type\": \"reset\",
+              \"label\": \"清除\"
+  		}]
+  	},
+  	\"varprocess_statement_provider\": {
+  		\"type\": \"list\",
+  		\"items\": [{
+  			\"type\": \"template\",
+  			\"label\": \"<变量赋值>\",
+  			\"name\": \"assign_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<对象赋值>\",
+  			\"name\": \"object_assign_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<数组赋值>\",
+  			\"name\": \"array_assign_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<如果...那么...>\",
+  			\"name\": \"if_then_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<如果...那么...否则...>\",
+  			\"name\": \"if_then_else_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<条件循环>\",
+  			\"name\": \"while_do_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<数组循环>\",
+  			\"name\": \"array_loop_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<数组元素筛选>\",
+  			\"name\": \"array_element_filter_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<向数组添加对象>\",
+  			\"name\": \"array_add_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<指定下标更新数组对象>\",
+  			\"name\": \"array_index_update_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"<代码库>\",
+  			\"name\": \"code_block_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"debugPrint\",
+  			\"name\": \"debugPrint_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"注释\",
+  			\"name\": \"annotation_template\"
+  		}, {
+  			\"type\": \"reset\",
+              \"label\": \"清除\"
+  		}]
+  	},
+  	\"element_statement_provider\": {
+  		\"type\": \"list\",
+  		\"items\": [{
+  			\"type\": \"template\",
+  			\"label\": \"<变量赋值>\",
+  			\"name\": \"assign_template\"
+  		}, {
+  			\"type\": \"template\",
+  			\"label\": \"结束返回(return)\",
+  			\"name\": \"return_template\"
+  		}, {
+  			\"type\": \"reset\",
+              \"label\": \"清除\"
+  		}]
+  	},
+  	\"dateformat_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<日期格式>\",
+  			\"provider\": \"dateformat_provider\"
+  		}]
+  	},
+  	\"dateformat_provider\": {
+  		\"type\": \"list\",
+  		\"items\": [{
+  			\"type\": \"text\",
+  			\"label\": \"yyyy\",
+  			\"value\": \"yyyy\"
+  		}, {
+  			\"type\": \"text\",
+  			\"label\": \"MM\",
+  			\"value\": \"MM\"
+  		}, {
+  			\"type\": \"text\",
+  			\"label\": \"dd\",
+  			\"value\": \"dd\"
+  		}, {
+  			\"type\": \"text\",
+  			\"label\": \"yyyy-MM\",
+  			\"value\": \"yyyy-MM\"
+  		}, {
+  			\"type\": \"text\",
+  			\"label\": \"yyyy-MM-dd\",
+  			\"value\": \"yyyy-MM-dd\"
+  		}, {
+  			\"type\": \"text\",
+  			\"label\": \"yyyy/MM/dd\",
+  			\"value\": \"yyyy/MM/dd\"
+  		}, {
+  			\"type\": \"text\",
+  			\"label\": \"yyyyMMdd\",
+  			\"value\": \"yyyyMMdd\"
+  		}, {
+  			\"type\": \"text\",
+  			\"label\": \"yyyy-MM-dd HH:mm:ss\",
+  			\"value\": \"yyyy-MM-dd HH:mm:ss\"
+  		}, {
+  			\"type\": \"text\",
+  			\"label\": \"yyyy/MM/dd HH:mm:ss\",
+  			\"value\": \"yyyy/MM/dd HH:mm:ss\"
+  		}, {
+  			\"type\": \"text\",
+  			\"label\": \"yyyyMMddHHmmss\",
+  			\"value\": \"yyyyMMddHHmmss\"
+  		}, {
+  			\"type\": \"text\",
+  			\"label\": \"yyyy年MM月dd日\",
+  			\"value\": \"yyyy年MM月dd日\"
+  		}, {
+  			\"type\": \"reset\",
+              \"label\": \"清除\"
+  		}]
+  	},
+  	\"round_type_template\": {
+  		\"type\": \"part\",
+  		\"parts\": [{
+  			\"type\": \"placeholder\",
+  			\"label\": \"<舍入方式>\",
+  			\"provider\": \"round_type_provider\"
+  		}]
+  	},
+  	\"round_type_provider\": {
+  		\"type\": \"list\",
+  		\"items\": [{
+  			\"type\": \"text\",
+  			\"label\": \"四舍五入\",
+  			\"value\": \"1\"
+  		}, {
+  			\"type\": \"text\",
+  			\"label\": \"向上舍入\",
+  			\"value\": \"2\"
+  		}, {
+  			\"type\": \"text\",
+  			\"label\": \"向下舍入\",
+  			\"value\": \"3\"
+  		}, {
+  			\"type\": \"reset\",
+              \"label\": \"清除\"
+  		}]
+  	},
+  	\"data_provider_number\": {
+  		\"type\": \"data\",
+  		\"items\": []
+  	},
+  	\"data_provider_bool\": {
+  		\"type\": \"data\",
+  		\"items\": []
+  	},
+  	\"data_provider_date\": {
+  		\"type\": \"data\",
+  		\"items\": []
+  	},
+  	\"data_provider_string\": {
+  		\"type\": \"data\",
+  		\"items\": []
+  	},
+  	\"data_provider_array\": {
+  		\"type\": \"data\",
+  		\"object_could_choose\": \"1\",
+  		\"items\": []
+  	},
+  	\"data_provider_leftValue\": {
+  		\"type\": \"data\",
+  		\"items\": []
+  	},
+  	\"data_provider_leftValue_array\": {
+  		\"type\": \"data\",
+  		\"object_could_choose\": \"1\",
+  		\"items\": []
+  	},
+  	\"data_provider_local\": {
+  		\"type\": \"data\",
+  		\"items\": []
+  	},
+  	\"data_provider_object\": {
+  		\"type\": \"data\",
+  		\"object_could_choose\": \"1\",
+  		\"items\": []
+  	},
+  	\"data_provider_object_array\": {
+  		\"type\": \"data\",
+  		\"object_could_choose\": \"1\",
+  		\"items\": []
+  	},
+  	\"data_provider_leftValue_object\": {
+  		\"type\": \"data\",
+  		\"object_could_choose\": \"1\",
+  		\"items\": []
+  	},
+  	\"data_provider_array_object\": {
+  		\"type\": \"data\",
+  		\"object_could_choose\": \"1\",
+  		\"items\": []
+  	},
+  	\"data_provider_array_number\": {
+  		\"type\": \"data\",
+  		\"items\": []
+  	},
+  	\"data_provider_array_bool\": {
+  		\"type\": \"data\",
+  		\"items\": []
+  	},
+  	\"data_provider_array_date\": {
+  		\"type\": \"data\",
+  		\"items\": []
+  	},
+  	\"data_provider_array_string\": {
+  		\"type\": \"data\",
+  		\"items\": []
+  	},
+  	\"data_provider_exception_value\": {
+  		\"type\": \"data\",
+  		\"items\": []
+  	},
+  	\"data_provider_dict_value\": {
+  		\"type\": \"data\",
+  		\"items\": []
+  	},
+  	\"function_provider_number\": {
+  		\"type\": \"list\",
+  		\"items\": []
+  	},
+  	\"function_provider_string\": {
+  		\"type\": \"list\",
+  		\"items\": []
+  	},
+  	\"function_provider_bool\": {
+  		\"type\": \"list\",
+  		\"items\": []
+  	},
+  	\"function_provider_date\": {
+  		\"type\": \"list\",
+  		\"items\": []
+  	},
+  	\"function_provider_array\": {
+  		\"type\": \"list\",
+  		\"items\": []
+  	},
+  	\"function_provider_array_number\": {
+  		\"type\": \"list\",
+  		\"items\": []
+  	},
+  	\"function_provider_array_string\": {
+  		\"type\": \"list\",
+  		\"items\": []
+  	},
+  	\"function_provider_array_bool\": {
+  		\"type\": \"list\",
+  		\"items\": []
+  	},
+  	\"function_provider_array_date\": {
+  		\"type\": \"list\",
+  		\"items\": []
+  	},
+  	\"function_provider_array_object\": {
+  		\"type\": \"list\",
+  		\"items\": []
+  	},
+  	\"function_provider_object\": {
+  		\"type\": \"list\",
+  		\"items\": []
+  	},
+  	\"function_common_provider\": {
+  		\"type\": \"list\",
+  		\"items\": []
+  	},
+  	\"function_common_provider_string\": {
+  		\"type\": \"list\",
+  		\"items\": []
+  	},
+  	\"function_common_provider_number\": {
+  		\"type\": \"list\",
+  		\"items\": []
+  	},
+  	\"function_common_provider_date\": {
+  		\"type\": \"list\",
+  		\"items\": []
+  	},
+  	\"function_common_provider_bool\": {
+  		\"type\": \"list\",
+  		\"items\": []
+  	},
+
+  	\"roster_provider_type\": {
+  		\"type\": \"list\",
+  		\"items\": []
+  	}
+
+  }"
+
+
+var_template_static_en: "{
+	\"break_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"text\",
+			\"label\": \"BreakLoop(break)\",
+			\"value\": \" \n break;\"
+		}]
+	},
+	\"continue_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"text\",
+			\"label\": \"ContinueLoop(continue)\",
+			\"value\": \" \n continue;\"
+		}]
+	},
+	\"return_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"text\",
+			\"label\": \"ReturnAndExit(return)\"
+		}]
+	},
+	\"annotation_template\": {
+		\"statement\": true,
+		\"repeat\": true,
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"text\",
+			\"label\": \"//\",
+			\"value\": \" \"
+		}, {
+			\"type\": \"input\",
+			\"label\": \"InputString\",
+			\"length\": \"500\",
+			\"dataType\": \"string\",
+			\"validate\": \"^[a-zA-Z1-9_]$\",
+			\"tip\": \"InputString, cannot contain special characters\"
+		}]
+	},
+	\"debugPrint_template\": {
+		\"statement\": true,
+		\"repeat\": true,
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"text\",
+			\"label\": \"debugPrint(\"
+		}, {
+		    \"type\":\"template\",
+		    \"label\":\"InputDebugInformation\",
+		    \"name\":\"string_template\"
+		}, {
+			\"type\": \"text\",
+			\"label\": \")\"
+		}]
+	},
+	\"code_block_template\": {
+		\"statement\": true,
+		\"repeat\": true,
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"text\",
+			\"label\": \"<CodeLibrary>\"
+		}]
+	},
+	\"varprocess_statement_template\": {
+		\"type\": \"block\",
+		\"lines\": [{
+			\"repeat\": true,
+			\"dropdown\": true,
+			\"parts\": [{
+				\"type\": \"placeholder\",
+				\"label\": \"<AddStatement>\",
+				\"provider\": \"varprocess_statement_provider\"
+			}]
+		}]
+	},
+	\"assign_template\": {
+		\"statement\": true,
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"text\",
+			\"label\": \"VariableAssignment\",
+			\"value\": \" \n \"
+		},{
+			\"type\": \"data\",
+			\"label\": \"<Left-handSideSelection>\",
+			\"name\": \"data_provider_leftValue\",
+			\"refresh\": \"0\"
+		}, {
+			\"type\": \"text\",
+			\"label\": \"=\",
+			\"value\": \"=\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<Right-handSideExpression>\",
+			\"name\": \"\",
+			\"refresh\": \"0\"
+		},{
+			\"type\": \"hidden\",
+			\"value\": \" ;\n \"
+		}
+		]
+	},
+	\"object_assign_template\": {
+		\"statement\": true,
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"text\",
+			\"label\": \"ObjectAssignment\",
+			\"value\": \" \n \"
+		},{
+			\"type\": \"data\",
+			\"label\": \"<ObjectSelection>\",
+			\"name\": \"data_provider_leftValue_object\",
+			\"refresh\": \"0\"
+		}, {
+			\"type\": \"text\",
+			\"label\": \"=\",
+			\"value\": \"=\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<Right-handSideObjectExpression>\",
+			\"name\": \"\",
+			\"refresh\": \"0\"
+		},{
+			\"type\": \"hidden\",
+			\"value\": \" ;\n \"
+		}]
+	},
+	\"array_assign_template\": {
+		\"statement\": true,
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"text\",
+			\"label\": \"ArrayAssignment\",
+			\"value\": \" \n \"
+		},{
+			\"type\": \"data\",
+			\"label\": \"<ArraySelection>\",
+			\"name\": \"data_provider_leftValue_array\",
+			\"refresh\": \"0\"
+		}, {
+			\"type\": \"text\",
+			\"label\": \"=\",
+			\"value\": \"=\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<Right-handSideArrayExpression>\",
+			\"name\": \"\",
+			\"refresh\": \"0\"
+		},{
+			\"type\": \"hidden\",
+			\"value\": \" ;\n \"
+		}]
+	},
+	\"array_add_template\": {
+		\"statement\": true,
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"text\",
+			\"label\": \"AddToArray\",
+			\"value\": \" \n \"
+		}, {
+			\"type\": \"data\",
+			\"label\": \"<SelectAnArray>\",
+			\"name\": \"data_provider_leftValue_array\",
+			\"refresh\": \"0\"
+		}, {
+			\"type\": \"text\",
+			\"label\": \"AddDataToArray\",
+			\"connect_operator\": true,
+			\"connect_value\": \"add\",
+			\"value\":\".add(\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<SelectData>\",
+			\"name\": \"\",
+			\"refresh\": \"0\"
+		},{
+			\"type\": \"hidden\",
+			\"value\": \");\"
+		}]
+	},
+	\"array_index_update_template\": {
+		\"statement\": true,
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"text\",
+			\"label\": \"updateObjectBasedOnArrayIndex\",
+			\"value\": \" \n \"
+		}, {
+			\"type\": \"data\",
+			\"label\": \"<SelectAnArray>\",
+			\"name\": \"data_provider_leftValue_array\",
+			\"refresh\": \"0\"
+		}, {
+			\"type\": \"text\",
+			\"label\": \"The1st/2nd/3rd/4th\",
+			\"connect_operator\": true,
+			\"connect_value\": \"add\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<NumericExpression>\",
+			\"name\": \"number_template\"
+		}, {
+			\"type\": \"text\",
+			\"label\": \"elements\",
+			\"dataType\":\"int\"
+		}, {
+			\"type\": \"text\",
+			\"label\": \"UpdateData\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<SelectData>\",
+			\"name\": \"\",
+			\"refresh\": \"0\"
+		}]
+	},
+	\"array_loop_template\": {
+		\"statement\": true,
+		\"type\": \"block\",
+		\"lines\": [{
+			\"road\": true,
+			\"parts\": [
+			{
+				\"type\": \"text\",
+				\"label\": \"ArrayLoop\"
+			}, {
+				\"type\": \"text\",
+				\"label\": \"Loop\",
+				\"value\":\" \n for (def  temp_for_name\"
+			}, {
+				\"type\": \"hidden\",
+				\"value\": \" : \"
+			}, {
+				\"type\": \"data\",
+				\"label\": \"<SelectAnArray>\",
+				\"name\": \"data_provider_array\",
+				\"newDynamicObject\": true
+			}, {
+				\"type\": \"hidden\",
+				\"value\": \"){\"
+			}]
+		}, {
+			\"repeat\": true,
+			\"dropdown\": true,
+			\"useDynamicObject\": true,
+			\"parts\": [{
+				\"type\": \"placeholder\",
+				\"label\": \"<AddStatement>\",
+				\"provider\": \"while_statement_provider\"
+			}]
+		}, {
+			\"parts\": [{
+				\"type\": \"hidden\",
+				\"value\": \"}\"
+			}]
+		}]
+	},
+	\"while_do_template\": {
+		\"statement\": true,
+		\"type\": \"block\",
+		\"lines\": [{
+			\"road\": true,
+			\"parts\": [{
+				\"type\": \"text\",
+				\"label\": \"ConditionalLoop\"
+			}, {
+				\"type\": \"text\",
+				\"label\": \"WhenSatisfied\",
+				\"value\": \" \n while(\"
+			}, {
+				\"type\": \"template\",
+				\"label\": \"<LogicalExpression>\",
+				\"name\": \"logic_template\"
+			}, {
+				\"type\": \"text\",
+				\"label\": \"ThenExecuteTheLoop\",
+				\"value\": \") {\"
+			}]
+		}, {
+			\"repeat\": true,
+			\"dropdown\": true,
+			\"marginLeft\": 42,
+			\"parts\": [{
+				\"type\": \"placeholder\",
+				\"label\": \"<AddStatement>\",
+				\"provider\": \"while_statement_provider\"
+			}]
+		}, {
+			\"parts\": [{
+				\"type\": \"hidden\",
+				\"value\": \"}\"
+			}]
+		}]
+	},
+	\"array_element_filter_template\": {
+		\"statement\": true,
+		\"type\": \"block\",
+		\"lines\": [{
+			\"road\": true,
+			\"parts\": [
+			{
+				\"type\": \"text\",
+				\"label\": \"FilterArray\"
+			}, {
+				\"type\": \"text\",
+				\"label\": \"For\",
+				\"value\":\" \n for (def  temp_for_name : \"
+			}, {
+				\"type\": \"data\",
+				\"label\": \"<SelectAnArray>\",
+				\"name\": \"data_provider_array\",
+				\"newDynamicObject\": true
+			}, {
+				\"type\": \"text\",
+				\"label\": \"AmongTheElementsThatSatisfy\",
+				\"value\": \"){ \n if(\"
+			}, {
+				\"type\": \"template\",
+				\"label\": \"<LogicalExpression>\",
+				\"useDynamicObject\": true,
+				\"name\": \"element_logic_template\"
+			}, {
+				\"type\": \"text\",
+				\"label\": \"ExecuteTheElementsThatMeetTheCondition\",
+				\"value\":\") {\"
+			}]
+		}, {
+			\"repeat\": true,
+			\"dropdown\": true,
+			\"useDynamicObject\": true,
+			\"parts\": [{
+				\"type\": \"placeholder\",
+				\"label\": \"<SelectionOperation>\",
+				\"provider\": \"while_statement_provider\"
+			}]
+		}, {
+			\"parts\": [{
+				\"type\": \"hidden\",
+				\"value\": \"}\"
+			},{
+				\"type\": \"hidden\",
+				\"value\": \" \n }\"
+			}]
+		}]
+	},
+	\"if_then_template\": {
+		\"statement\": true,
+		\"extends\": true,
+		\"type\": \"block\",
+		\"lines\": [{
+			\"stay\": true,
+			\"parts\": [{
+				\"type\": \"text\",
+				\"label\": \"If\",
+				\"value\": \" \n if(\"
+			}, {
+				\"type\": \"template\",
+				\"label\": \"<LogicalExpression>\",
+				\"name\": \"logic_template\"
+			}]
+		}, {
+			\"stay\": true,
+			\"road\": true,
+			\"parts\": [{
+				\"type\": \"text\",
+				\"label\": \"Then\",
+				\"negativeLine\": true,
+				\"value\": \") {\"
+			}]
+		}, {
+			\"stay\": true,
+			\"repeat\": true,
+			\"dropdown\": true,
+			\"marginLeft\": 42,
+			\"parts\": [{
+				\"type\": \"placeholder\",
+				\"label\": \"<AddStatement>\",
+				\"provider\": \"statement_provider\"
+			}]
+		}, {
+			\"stay\": true,
+			\"parts\": [{
+				\"type\": \"hidden\",
+				\"value\": \" \n }\"
+			},{
+				\"type\": \"hidden\",
+				\"value\": \" \n \"
+			}]
+		}]
+	},
+	\"if_then_else_template\": {
+		\"statement\": true,
+		\"extends\": true,
+		\"type\": \"block\",
+		\"lines\": [{
+			\"stay\": true,
+			\"parts\": [{
+				\"type\": \"text\",
+				\"label\": \"If\",
+				\"value\": \" \n if(\"
+			}, {
+				\"type\": \"template\",
+				\"label\": \"<LogicalExpression>\",
+				\"name\": \"logic_template\"
+			}]
+		}, {
+			\"stay\": true,
+			\"road\": true,
+			\"parts\": [{
+				\"type\": \"text\",
+				\"label\": \"Then\",
+				\"negativeLine\": true,
+				\"value\": \") {\"
+			}]
+		}, {
+			\"stay\": true,
+			\"repeat\": true,
+			\"dropdown\": true,
+			\"marginLeft\": 42,
+			\"parts\": [{
+				\"type\": \"placeholder\",
+				\"label\": \"<AddStatement>\",
+				\"provider\": \"statement_provider\"
+			}]
+		}, {
+			\"road\": true,
+			\"parts\": [{
+				\"type\": \"text\",
+				\"label\": \"Otherwise\",
+				\"negativeLine\": true,
+				\"value\": \"} \n else {\"
+			}]
+		}, {
+			\"repeat\": true,
+			\"dropdown\": true,
+			\"parts\": [{
+				\"type\": \"placeholder\",
+				\"label\": \"<AddStatement>\",
+				\"provider\": \"statement_provider\"
+			}]
+		},  {
+			\"stay\": true,	
+			\"parts\": [{
+				\"type\": \"hidden\",
+				\"value\": \"\n }\"
+			},{
+				\"type\": \"hidden\",
+				\"value\": \" \n \"
+			}]
+		}]
+	},
+	\"if_then_while_template\": {
+		\"statement\": true,
+		\"type\": \"block\",
+		\"extends\": true,
+		\"lines\": [{
+			\"stay\": true,
+			\"parts\": [{
+				\"type\": \"text\",
+				\"label\": \"If\",
+				\"value\": \" \n if(\"
+			}, {
+				\"type\": \"template\",
+				\"label\": \"<LogicalExpression>\",
+				\"name\": \"logic_template\"
+			}]
+		}, {
+			\"stay\": true,
+			\"road\": true,
+			\"parts\": [{
+				\"type\": \"text\",
+				\"label\": \"Then\",
+				\"negativeLine\": true,
+				\"value\": \") {\"
+			}]
+		}, {
+			\"stay\": true,
+			\"repeat\": true,
+			\"dropdown\": true,
+			\"marginLeft\": 42,
+			\"parts\": [{
+				\"type\": \"placeholder\",
+				\"label\": \"<AddStatement>\",
+				\"provider\": \"if_then_while_statement_provider\"
+			}]
+		}, {
+			\"stay\": true,
+			\"parts\": [{
+				\"type\": \"hidden\",
+				\"value\": \"}\"
+			},{
+				\"type\": \"hidden\",
+				\"value\": \" \n \"
+			}]
+		}]
+	},
+	\"if_then_else_while_template\": {
+		\"statement\": true,
+		\"type\": \"block\",
+		\"extends\": true,
+		\"lines\": [{
+			\"stay\": true,
+			\"parts\": [{
+				\"type\": \"text\",
+				\"label\": \"If\",
+				\"value\": \" \n if(\"
+			}, {
+				\"type\": \"template\",
+				\"label\": \"<LogicalExpression>\",
+				\"name\": \"logic_template\"
+			}]
+		}, {
+			\"stay\": true,
+			\"road\": true,
+			\"parts\": [{
+				\"type\": \"text\",
+				\"label\": \"Then\",
+				\"negativeLine\": true,
+				\"value\": \") {\"
+			}]
+		}, {
+			\"stay\": true,
+			\"repeat\": true,
+			\"dropdown\": true,
+			\"marginLeft\": 42,
+			\"parts\": [{
+				\"type\": \"placeholder\",
+				\"label\": \"<AddStatement>\",
+				\"provider\": \"if_then_while_statement_provider\"
+			}]
+		}, {
+			\"road\": true,
+			\"parts\": [{
+				\"type\": \"text\",
+				\"label\": \"Otherwise\",
+				\"negativeLine\": true,
+				\"value\": \"} \n else {\"
+			}]
+		}, {
+			\"repeat\": true,
+			\"dropdown\": true,
+			\"parts\": [{
+				\"type\": \"placeholder\",
+				\"label\": \"<AddStatement>\",
+				\"provider\": \"if_then_while_statement_provider\"
+			}]
+		},  {
+			\"stay\": true,
+			\"parts\": [{
+				\"type\": \"hidden\",
+				\"value\": \"\n }\"
+			},{
+				\"type\": \"hidden\",
+				\"value\": \" \n \"
+			}]
+		}]
+	},
+	\"logic_template\": {
+		\"type\": \"part\",
+		\"connect\": true,
+		\"connect_operators\": [{
+			\"label\": \"and\",
+			\"value\": \"&&\"
+		}, {
+			\"label\": \"or\",
+			\"value\": \"||\"
+		}, {
+			\"label\": \"Delete.\",
+			\"value\": \"DEL\"
+		}],
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<LogicalExpression>\",
+			\"provider\": \"logic_provider\"
+		}]
+	},
+	\"out_logic_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<LogicalExpression>\",
+			\"provider\": \"out_logic_provider\"
+		}]
+	},
+	\"element_logic_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"template\",
+			\"label\": \"<LogicalExpression>\",
+			\"name\": \"logic_template\",
+			\"constraint\":\"element_attr\"
+		}]
+	},
+	\"regx_logic_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"template\",
+			\"label\": \"<StringExpression>\",
+			\"name\": \"string_template\"
+		}, {
+			\"type\": \"text\",
+			\"label\": \"RegularExpressionMatching\",
+			\"value\": \"matches\"
+		}, {
+			\"type\": \"input\",
+			\"label\": \"InputRegularExpression\",
+			\"length\": \"20\",
+			\"datatype\": \"string\",
+			\"validate\": \"^^[a-zA-Z1-9_]$$\",
+			\"tip\": \"Input regular expression\"
+		}]
+	},
+	\"paren_logic_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"text\",
+			\"label\": \"(\",
+			\"value\": \"(\"
+		}, {
+			\"type\": \"template\",
+			\"name\": \"logic_template\"
+		}, {
+			\"type\": \"text\",
+			\"label\": \")\",
+			\"value\": \")\"
+		}]
+	},
+	\"number_logic_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"template\",
+			\"label\": \"<NumericExpression>\",
+			\"name\": \"number_template\"
+		}, {
+			\"type\": \"list\",
+			\"items\": [{
+				\"label\": \"GreaterThan\",
+				\"value\": \">\"
+			}, {
+				\"label\": \"GreaterThanOrEqualTo\",
+				\"value\": \">=\"
+			}, {
+				\"label\": \"LessThan\",
+				\"value\": \"<\"
+			}, {
+				\"label\": \"LessThanOrEqualTo\",
+				\"value\": \"<=\"
+			}, {
+				\"label\": \"EqualTo\",
+				\"value\": \"==\"
+			}, {
+				\"label\": \"NotEqualTo\",
+				\"value\": \"!=\"
+			}, {
+				\"label\": \"InSet\",
+				\"value\": \"in\",
+				\"template\": \"array_number_template\"
+			}, {
+				\"label\": \"NotInSet\",
+				\"value\": \"notin\",
+				\"template\": \"array_number_template\"
+			}]
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<NumericExpression>\",
+			\"name\": \"number_template\"
+		}]
+	},
+	\"string_logic_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"template\",
+			\"label\": \"<StringExpression>\",
+			\"name\": \"string_template\"
+		}, {
+			\"type\": \"list\",
+			\"items\": [{
+				\"label\": \"EqualTo\",
+				\"value\": \"equal\"
+			}, {
+				\"label\": \"EqualTo(case-insensitive)\",
+				\"value\": \"equals\"
+			}, {
+				\"label\": \"NotEqualTo\",
+				\"value\": \"notequal\"
+			}, {
+				\"label\": \"InSet\",
+				\"value\": \"in\",
+				\"template\": \"array_string_template\"
+			}, {
+				\"label\": \"NotInSet\",
+				\"value\": \"notin\",
+				\"template\": \"array_string_template\"
+			}, {
+				\"label\": \"StartsWith\",
+				\"value\": \"start\"
+			}, {
+				\"label\": \"DoesNotStartWith\",
+				\"value\": \"notstart\"
+			}, {
+				\"label\": \"EndsWith\",
+				\"value\": \"end\"
+			}, {
+				\"label\": \"DoesNotEndWith\",
+				\"value\": \"notend\"
+			}, {
+				\"label\": \"Contains\",
+				\"value\": \"include\"
+			}, {
+				\"label\": \"DoesNotContain\",
+				\"value\": \"notinclude\"
+			}, {
+				\"label\": \"ContainsAnyElement\",
+				\"value\": \"includeEle\",
+				\"template\": \"array_string_template\"
+			}, {
+				\"label\": \"DoesNotContainAllElements\",
+				\"value\": \"notincludeEle\",
+				\"template\": \"array_string_template\"
+			}]
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<StringExpression>\",
+			\"name\": \"string_template\"
+		}]
+	},
+	\"date_logic_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"template\",
+			\"label\": \"<ADate>\",
+			\"name\": \"date_template\"
+		}, {
+			\"type\": \"list\",
+			\"items\": [{
+				\"label\": \"GreaterThan\",
+				\"value\": \">\"
+			}, {
+				\"label\": \"GreaterThanOrEqualTo\",
+				\"value\": \">=\"
+			}, {
+				\"label\": \"LessThan\",
+				\"value\": \"<\"
+			}, {
+				\"label\": \"LessThanOrEqualTo\",
+				\"value\": \"<=\"
+			}, {
+				\"label\": \"EqualTo\",
+				\"value\": \"equal\"
+			}, {
+				\"label\": \"NotEqualTo\",
+				\"value\": \"notequal\"
+			}]
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<ADate>\",
+			\"name\": \"date_template\"
+		}]
+	},
+	\"not_logic_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"text\",
+			\"label\": \"Not\",
+			\"value\": \"!\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<LogicalExpression>\",
+			\"name\": \"logic_template\"
+		}]
+	},
+	\"not_paren_logic_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"text\",
+			\"label\": \"not\",
+			\"value\": \"!\"
+		}, {
+			\"type\": \"template\",
+			\"name\": \"paren_logic_template\"
+		}]
+	},
+	\"number_template\": {
+		\"type\": \"part\",
+		\"connect\": true,
+		\"connect_operators\": [{
+			\"label\": \"+\",
+			\"value\": \"+\"
+		}, {
+			\"label\": \"-\",
+			\"value\": \"-\"
+		}, {
+			\"label\": \"×\",
+			\"value\": \"*\"
+		}, {
+			\"label\": \"÷\",
+			\"value\": \"/\"
+		}, {
+			\"label\": \"Delete.\",
+			\"value\": \"DEL\"
+		}],
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<NumericExpression>\",
+			\"useParentPlaceholder\": true,
+			\"provider\": \"number_provider\"
+		}]
+	},
+	\"out_number_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<NumericExpression>\",
+			\"useParentPlaceholder\": true,
+			\"provider\": \"out_number_provider\"
+		}]
+	},
+	\"paren_number_expr_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"text\",
+			\"label\": \"(\",
+			\"value\": \"(\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<NumericExpression>\",
+			\"useParentPlaceholder\": true,
+			\"name\": \"number_template\"
+		}, {
+			\"type\": \"text\",
+			\"label\": \")\",
+			\"value\": \")\"
+		}]
+	},
+	\"string_template\": {
+		\"type\": \"part\",
+		\"connect\": true,
+		\"connect_operators\": [{
+			\"label\": \"+\",
+			\"value\": \"+\"
+		}, {
+			\"label\": \"Delete.\",
+			\"value\": \"DEL\"
+		}],
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<StringExpression>\",
+			\"useParentPlaceholder\": true,
+			\"provider\": \"string_provider\"
+		}]
+	},
+	\"out_string_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<StringExpression>\",
+			\"useParentPlaceholder\": true,
+			\"provider\": \"out_string_provider\"
+		}]
+	},
+	\"multi_string_template\": {
+		\"type\": \"part\",
+		\"connect\": true,
+		\"connect_operators\": [{
+			\"label\": \",\",
+			\"value\": \",\"
+		}, {
+			\"label\": \"Delete.\",
+			\"value\": \"DEL\"
+		}],
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<StringExpression>\",
+			\"useParentPlaceholder\": true,
+			\"provider\": \"string_provider\"
+		}]
+	},
+	\"multi_number_template\": {
+		\"type\": \"part\",
+		\"connect\": true,
+		\"connect_operators\": [{
+			\"label\": \",\",
+			\"value\": \",\"
+		}, {
+			\"label\": \"Delete.\",
+			\"value\": \"DEL\"
+		}],
+		\"parts\": [{
+			\"type\": \"hidden\",
+			\"value\": \"new Double(\"
+		},{
+			\"type\": \"placeholder\",
+			\"label\": \"<NumericExpression>\",
+			\"provider\": \"number_provider\"
+		},{
+			\"type\": \"hidden\",
+			\"value\": \")\"
+		}]
+	},
+	\"multi_date_template\": {
+		\"type\": \"part\",
+		\"connect\": true,
+		\"connect_operators\": [{
+			\"label\": \",\",
+			\"value\": \",\"
+		}, {
+			\"label\": \"Delete.\",
+			\"value\": \"DEL\"
+		}],
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<DateExpression>\",
+			\"useParentPlaceholder\": true,
+			\"provider\": \"date_provider\"
+		}]
+	},
+	\"multi_bool_template\": {
+		\"type\": \"part\",
+		\"connect\": true,
+		\"connect_operators\": [{
+			\"label\": \",\",
+			\"value\": \",\"
+		}, {
+			\"label\": \"Delete.\",
+			\"value\": \"DEL\"
+		}],
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<BooleanExpression>\",
+			\"useParentPlaceholder\": true,
+			\"provider\": \"logic_provider\"
+		}]
+	},
+	\"date_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<ADate>\",
+			\"provider\": \"date_provider\"
+		}]
+	},
+	\"out_date_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<ADate>\",
+			\"provider\": \"out_date_provider\"
+		}]
+	},
+	\"object_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<ObjectExpression>\",
+			\"provider\": \"object_provider\"
+		}]
+	},
+	\"array_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<ArrayExpression>\",
+			\"provider\": \"array_provider\"
+		}]
+	},
+	\"opt_object_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<ObjectExpression>\",
+			\"provider\": \"opt_object_provider\"
+		}]
+	},
+	\"whole_object_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<ObjectExpression>\",
+			\"provider\": \"whole_object_provider\"
+		}]
+	},
+	\"opt_object_array_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<ObjectArrayExpression>\",
+			\"provider\": \"opt_object_array_provider\"
+		}]
+	},
+	\"array_object_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<ObjectArrayExpression>\",
+			\"useParentPlaceholder\": true,
+			\"provider\": \"array_object_provider\"
+		}]
+	},
+	\"array_string_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<StringArrayExpression>\",
+			\"provider\": \"array_string_provider\"
+		}]
+	},
+	\"array_number_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<NumericArrayExpression>\",
+			\"provider\": \"array_number_provider\"
+		}]
+	},
+	\"array_logic_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<BooleanArrayExpression>\",
+			\"provider\": \"array_bool_provider\"
+		}]
+	},
+	\"array_date_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<DateArrayExpression>\",
+			\"provider\": \"array_date_provider\"
+		}]
+	},
+	\"out_array_string_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<StringArrayExpression>\",
+			\"provider\": \"out_array_string_provider\"
+		}]
+	},
+	\"out_array_number_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<NumericArrayExpression>\",
+			\"provider\": \"out_array_number_provider\"
+		}]
+	},
+	\"out_array_logic_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<BooleanArrayExpression>\",
+			\"provider\": \"out_array_bool_provider\"
+		}]
+	},
+	\"out_array_date_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<DateArrayExpression>\",
+			\"provider\": \"out_array_date_provider\"
+		}]
+	},
+	\"string_collection_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"text\",
+			\"label\": \"(\",
+			\"value\": \"[\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<StringExpression>AddSelection\",
+			\"name\": \"multi_string_template\"
+		}, {
+		    \"type\":\"text\",
+			\"label\":\")\",
+		    \"value\":\"]\"
+		}]
+	},
+	\"number_collection_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"text\",
+			\"label\": \"(\",
+			\"value\": \"[\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<NumericExpression>AddSelection\",
+			\"name\": \"multi_number_template\"
+		}, {
+		    \"type\":\"text\",
+			\"label\":\")\",
+		    \"value\":\"]\"
+		}]
+	},
+	\"date_collection_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"text\",
+			\"label\": \"(\",
+			\"value\": \"[\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<DateExpression>AddSelection\",
+			\"name\": \"multi_date_template\"
+		}, {
+		    \"type\":\"text\",
+			\"label\":\")\",
+		    \"value\":\"]\"
+		}]
+	},
+	\"bool_collection_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"text\",
+			\"label\": \"(\",
+			\"value\": \"[\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<BooleanExpression>AddSelection\",
+			\"name\": \"multi_bool_template\"
+		}, {
+		    \"type\":\"text\",
+			\"label\":\")\",
+		    \"value\":\"]\"
+		}]
+	},
+	\"exception_value_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"data\",
+            \"name\": \"data_provider_exception_value\",
+			\"useParentPlaceholder\": true,
+            \"label\": \"ExceptionValue\"
+		}]
+	},
+	\"dict_value_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"data\",
+            \"name\": \"data_provider_dict_value\",
+			\"useParentPlaceholder\": true,
+            \"label\": \"SelectDictionary\"
+		}]
+	},
+	\"function_number_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<NumericFunction>\",
+			\"provider\": \"function_provider_number\"
+		}]
+	},
+    \"function_string_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<StringFunction>\",
+			\"provider\": \"function_provider_string\"
+		}]
+	},
+    \"function_bool_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<BooleanFunction>\",
+			\"provider\": \"function_provider_bool\"
+		}]
+	},
+    \"function_date_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<DateFunction>\",
+			\"provider\": \"function_provider_date\"
+		}]
+	},
+	\"function_array_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<ArrayFunction>\",
+			\"provider\": \"function_provider_array\"
+		}]
+	},
+	\"function_object_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<ObjectFunction>\",
+			\"provider\": \"function_provider_object\"
+		}]
+	},
+	\"function_array_object_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<ObjectArrayFunction>\",
+			\"provider\": \"function_provider_array_object\"
+		}]
+	},
+	\"function_array_string_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<StringArrayFunction>\",
+			\"provider\": \"function_provider_array_string\"
+		}]
+	},
+	\"function_array_number_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<NumericArrayFunction>\",
+			\"provider\": \"function_provider_array_number\"
+		}]
+	},
+	\"function_array_date_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<DateArrayFunction>\",
+			\"provider\": \"function_provider_array_date\"
+		}]
+	},
+	\"function_array_bool_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<BooleanArrayFunction>\",
+			\"provider\": \"function_provider_array_bool\"
+		}]
+	},
+	\"function_common_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<VariableTemplate>\",
+			\"useParentPlaceholder\": true,
+			\"provider\": \"function_common_provider\"
+		}]
+	},
+	\"function_common_string_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<StringVariableTemplate>\",
+			\"useParentPlaceholder\": true,
+			\"provider\": \"function_common_provider_string\"
+		}]
+	},
+	\"function_common_number_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<NumericVariableTemplate>\",
+			\"useParentPlaceholder\": true,
+			\"provider\": \"function_common_provider_number\"
+		}]
+	},
+	\"function_common_date_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<DateVariableTemplate>\",
+			\"useParentPlaceholder\": true,
+			\"provider\": \"function_common_provider_date\"
+		}]
+	},
+	\"function_common_bool_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<BooleanVariableTemplate>\",
+			\"useParentPlaceholder\": true,
+			\"provider\": \"function_common_provider_bool\"
+		}]
+	},
+	\"sort_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<Sort>\",
+			\"provider\": \"sort_provider\"
+		}]
+	},
+	\"sort_provider\": {
+		\"type\": \"list\",
+		\"items\": [{
+			\"type\": \"text\",
+			\"label\": \"AscendingOrder\",
+			\"value\": \"asc\"
+		}, {
+			\"type\": \"text\",
+			\"label\": \"DescendingOrder\",
+			\"value\": \"desc\"
+		}, {
+			\"type\": \"reset\",
+            \"label\": \"Clear\"
+		}]
+	},
+	\"condition_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<Condition>\",
+			\"provider\": \"condition_provider\"
+		}]
+	},
+	\"condition_provider\": {
+		\"type\": \"list\",
+		\"items\": [{
+			\"type\": \"text\",
+			\"label\": \"GreaterThan\",
+			\"value\": \">\"
+		}, {
+			\"type\": \"text\",
+			\"label\": \"GreaterThanOrEqualTo\",
+			\"value\": \">=\"
+		}, {
+			\"type\": \"text\",
+			\"label\": \"LessThan\",
+			\"value\": \"<\"
+		}, {
+			\"type\": \"text\",
+			\"label\": \"LessThanOrEqualTo\",
+			\"value\": \"<=\"
+		}, {
+			\"type\": \"text\",
+			\"label\": \"EqualTo\",
+			\"value\": \"==\"
+		}, {
+			\"type\": \"text\",
+			\"label\": \"NotEqualTo\",
+			\"value\": \"!=\"
+		}, {
+			\"type\": \"reset\",
+            \"label\": \"Clear\"
+		}]
+	},
+	\"logic_provider\": {
+		\"type\": \"list\",
+		\"items\": [{
+			\"type\": \"text\",
+			\"label\": \"true\",
+			\"value\": true
+		}, {
+			\"type\": \"text\",
+			\"label\": \"false\",
+			\"value\": false
+		}, {
+			\"type\": \"data\",
+			\"label\": \"BooleanVariable\",
+			\"name\": \"data_provider_bool\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"Boolean exception value\",
+			\"dataType\": \"boolean\",
+			\"name\": \"exception_value_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<NumericLogicalExpression>\",
+			\"name\": \"number_logic_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<StringLogicalExpression>\",
+			\"name\": \"string_logic_template\" 
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<RegularExpressionMatchingLogicalExpression.>\",
+			\"name\": \"regx_logic_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<DateLogicalExpression>\",
+			\"name\": \"date_logic_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"(<LogicalExpression>)\",
+			\"name\": \"paren_logic_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"not <LogicalExpression>\",
+			\"name\": \"not_logic_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"not (<LogicalExpression>)\",
+			\"name\": \"not_paren_logic_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<BooleanFunction>\",
+			\"name\": \"function_bool_template\"
+		}, {
+			\"type\": \"reset\",
+            \"label\": \"Clear\"
+		}]
+	},
+	\"number_provider\": {
+		\"type\": \"list\",
+		\"items\": [{
+			\"type\": \"input\",
+			\"label\": \"InputNumericValue\",
+			\"length\": \"15\",
+			\"dataType\": \"number\",
+			\"validate\": \"^-?[1-9]\\\\d*$|^-?([1-9]\\\\d*\\\\.\\\\d*|0\\\\.\\\\d*[1-9]\\\\d*|0?\\\\.0+|0)$\",
+			\"tip\": \"Input integer or decimal\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"SelectDictionary\",
+			\"name\": \"dict_value_template\"
+		}, {
+			\"type\": \"data\",
+			\"label\": \"NumericVariable\",
+			\"name\": \"data_provider_number\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"(<NumericExpression>)\",
+			\"name\": \"paren_number_expr_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"Numeric exception value\",
+			\"name\": \"exception_value_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<NumericFunction>\",
+			\"name\": \"function_number_template\"
+		}, {
+			\"type\": \"reset\",
+            \"label\": \"Clear\"
+		}]
+	},
+	\"string_provider\": {
+		\"type\": \"list\",
+		\"items\": [{
+			\"type\": \"input\",
+			\"label\": \"InputString\",
+			\"length\": \"15\",
+			\"dataType\": \"string\",
+			\"validate\": \"^[a-zA-Z1-9_]$\",
+			\"tip\": \"InputString, cannot contain special characters\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"SelectDictionary\",
+			\"name\": \"dict_value_template\"
+		}, {
+			\"type\": \"data\",
+			\"label\": \"StringVariable\",
+			\"name\": \"data_provider_string\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"String exception value\",
+			\"name\": \"exception_value_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<StringFunction>\",
+			\"name\": \"function_string_template\"
+		}, {
+			\"type\": \"reset\",
+            \"label\": \"Clear\"
+		}]
+	},
+	\"date_provider\": {
+		\"type\": \"list\",
+		\"items\": [{
+			\"type\": \"date\",
+			\"transType\": \"year\",
+			\"dataType\": \"date\",
+			\"label\": \"SelectYear\"
+		},
+		{
+			\"type\": \"date\",
+			\"transType\": \"month\",
+			\"dataType\": \"date\",
+			\"label\": \"SelectMonth\"
+		},
+		{
+			\"type\": \"date\",
+			\"transType\": \"date\",
+			\"dataType\": \"date\",
+			\"label\": \"SelectDate\"
+		},
+		{
+			\"type\": \"date\",
+			\"transType\": \"datetime\",
+			\"dataType\": \"datetime\",
+			\"label\": \"SelectTime\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"SelectDictionary\",
+			\"name\": \"dict_value_template\"
+		}, {
+			\"type\": \"data\",
+			\"label\": \"DateVariable\",
+			\"name\": \"data_provider_date\"
+		}, 
+		{
+			\"type\": \"template\",
+			\"label\": \"Date exception value\",
+			\"name\": \"exception_value_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<DateFunction>\",
+			\"name\": \"function_date_template\"
+		}, {
+			\"type\": \"reset\",
+            \"label\": \"Clear\"
+		}]
+	},
+	\"out_logic_provider\": {
+		\"type\": \"list\",
+		\"items\": [{
+			\"type\": \"data\",
+			\"label\": \"BooleanVariable\",
+			\"name\": \"data_provider_bool\"
+		}, {
+			\"type\": \"reset\",
+            \"label\": \"Clear\"
+		}]
+	},
+	\"out_number_provider\": {
+		\"type\": \"list\",
+		\"items\": [{
+			\"type\": \"data\",
+			\"label\": \"NumericVariable\",
+			\"name\": \"data_provider_number\"
+		}, {
+			\"type\": \"reset\",
+            \"label\": \"Clear\"
+		}]
+	},
+	\"out_string_provider\": {
+		\"type\": \"list\",
+		\"items\": [{
+			\"type\": \"data\",
+			\"label\": \"StringVariable\",
+			\"name\": \"data_provider_string\"
+		}, {
+			\"type\": \"reset\",
+            \"label\": \"Clear\"
+		}]
+	},
+	\"out_date_provider\": {
+		\"type\": \"list\",
+		\"items\": [{
+			\"type\": \"data\",
+			\"label\": \"DateVariable\",
+			\"name\": \"data_provider_date\"
+		},{
+			\"type\": \"reset\",
+            \"label\": \"Clear\"
+		}]
+	},
+	\"array_provider\": {
+		\"type\": \"list\",
+		\"items\": [{
+			\"type\": \"data\",
+			\"label\": \"<SelectAnArray>\",
+			\"name\": \"data_provider_array\",
+			\"refresh\": \"0\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<ArrayFunction>\",
+			\"name\": \"function_array_template\"
+		}, {
+			\"type\": \"reset\",
+            \"label\": \"Clear\"
+		}]
+	},
+	\"object_provider\": {
+		\"type\": \"list\",
+		\"items\": [{
+			\"type\": \"template\",
+			\"label\": \"InputObject.\",
+			\"flat\": true,
+			\"name\": \"\"
+		}, {
+			\"type\": \"data\",
+			\"label\": \"SelectObject\",
+			\"cascading_object_flag\": true,
+			\"name\": \"data_provider_object\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<ObjectFunction>\",
+			\"name\": \"function_object_template\"
+		}, {
+			\"type\": \"reset\",
+            \"label\": \"Clear\"
+		}]
+	},
+	\"opt_object_provider\": {
+		\"type\": \"list\",
+		\"items\": [{
+			\"type\": \"data\",
+			\"label\": \"SelectObject\",
+			\"cascading_object_flag\": true,
+			\"name\": \"data_provider_object\"
+		}, {
+			\"type\": \"reset\",
+            \"label\": \"Clear\"
+		}]
+	},
+	\"whole_object_provider\": {
+		\"type\": \"list\",
+		\"items\": [{
+			\"type\": \"data\",
+			\"label\": \"SelectObject\",
+			\"name\": \"data_provider_object\"
+		}, {
+			\"type\": \"reset\",
+            \"label\": \"Clear\"
+		}]
+	},
+	\"opt_object_array_provider\": {
+		\"type\": \"list\",
+		\"items\": [{
+			\"type\": \"data\",
+			\"label\": \"SelectObjectArray\",
+			\"cascading_object_flag\": true,
+			\"name\": \"data_provider_array_object\"
+		}, {
+			\"type\": \"reset\",
+            \"label\": \"Clear\"
+		}]
+	},
+	\"array_object_provider\": {
+		\"type\": \"list\",
+		\"items\": [{
+			\"type\": \"data\",
+			\"label\": \"SelectObjectArray\",
+			\"cascading_object_flag\": true,
+			\"name\": \"data_provider_array_object\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<ObjectArrayFunction>\",
+			\"name\": \"function_array_object_template\"
+		}, {
+			\"type\": \"reset\",
+            \"label\": \"Clear\"
+		}]
+	},
+	\"array_string_provider\": {
+		\"type\": \"list\",
+		\"items\": [{
+			\"type\": \"data\",
+			\"label\": \"StringArrayVariable\",
+			\"name\": \"data_provider_array_string\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"(<StringExpression>AddSelection)\",
+			\"name\": \"string_collection_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<StringArrayFunction>\",
+			\"name\": \"function_array_string_template\"
+		}, {
+			\"type\": \"reset\",
+            \"label\": \"Clear\"
+		}]
+	},
+	\"array_number_provider\": {
+		\"type\": \"list\",
+		\"items\": [{
+			\"type\": \"data\",
+			\"label\": \"NumericArrayVariable\",
+			\"name\": \"data_provider_array_number\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"(<NumericExpression>AddSelection)\",
+			\"name\": \"number_collection_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<NumericArrayFunction>\",
+			\"name\": \"function_array_number_template\"
+		}, {
+			\"type\": \"reset\",
+            \"label\": \"Clear\"
+		}]
+	},
+	\"array_date_provider\": {
+		\"type\": \"list\",
+		\"items\": [{
+			\"type\": \"data\",
+			\"label\": \"DateArrayVariable\",
+			\"name\": \"data_provider_array_date\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"(<DateExpression>AddSelection)\",
+			\"name\": \"date_collection_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<DateArrayFunction>\",
+			\"name\": \"function_array_date_template\"
+		}, {
+			\"type\": \"reset\",
+            \"label\": \"Clear\"
+		}]
+	},
+	\"array_bool_provider\": {
+		\"type\": \"list\",
+		\"items\": [{
+			\"type\": \"data\",
+			\"label\": \"BooleanArrayVariable\",
+			\"name\": \"data_provider_array_bool\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"(<BooleanExpression>AddSelection)\",
+			\"name\": \"bool_collection_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<BooleanArrayFunction>\",
+			\"name\": \"function_array_bool_template\"
+		}, {
+			\"type\": \"reset\",
+            \"label\": \"Clear\"
+		}]
+	},
+	\"out_array_string_provider\": {
+		\"type\": \"list\",
+		\"items\": [{
+			\"type\": \"data\",
+			\"label\": \"StringArrayVariable\",
+			\"name\": \"data_provider_array_string\"
+		}, {
+			\"type\": \"reset\",
+            \"label\": \"Clear\"
+		}]
+	},
+	\"out_array_number_provider\": {
+		\"type\": \"list\",
+		\"items\": [{
+			\"type\": \"data\",
+			\"label\": \"NumericArrayVariable\",
+			\"name\": \"data_provider_array_number\"
+		}, {
+			\"type\": \"reset\",
+            \"label\": \"Clear\"
+		}]
+	},
+	\"out_array_date_provider\": {
+		\"type\": \"list\",
+		\"items\": [{
+			\"type\": \"data\",
+			\"label\": \"DateArrayVariable\",
+			\"name\": \"data_provider_array_date\"
+		}, {
+			\"type\": \"reset\",
+            \"label\": \"Clear\"
+		}]
+	},
+	\"out_array_bool_provider\": {
+		\"type\": \"list\",
+		\"items\": [{
+			\"type\": \"data\",
+			\"label\": \"BooleanArrayVariable\",
+			\"name\": \"data_provider_array_bool\"
+		}, {
+			\"type\": \"reset\",
+            \"label\": \"Clear\"
+		}]
+	},
+	\"if_then_while_statement_provider\": {
+		\"type\": \"list\",
+		\"items\": [{
+			\"type\": \"template\",
+			\"label\": \"<VariableAssignment>\",
+			\"name\": \"assign_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<ObjectAssignment>\",
+			\"name\": \"object_assign_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<ArrayAssignment>\",
+			\"name\": \"array_assign_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<If...then...>\",
+			\"name\": \"if_then_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<If...then...else...>\",
+			\"name\": \"if_then_else_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<ConditionalLoop>\",
+			\"name\": \"while_do_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<ArrayLoop>\",
+			\"name\": \"array_loop_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<ArrayElementFiltering>\",
+			\"name\": \"array_element_filter_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<AddToArray>\",
+			\"name\": \"array_add_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<UpdateArrayObjectByIndex>\",
+			\"name\": \"array_index_update_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<Code library>\",
+			\"name\": \"code_block_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"debugPrint\",
+			\"name\": \"debugPrint_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"Comment\",
+			\"name\": \"annotation_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<ContinueLoop>\",
+			\"name\": \"continue_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<BreakLoop>\",
+			\"name\": \"break_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"ReturnAndExit(return)\",
+			\"name\": \"return_template\"
+		}, {
+			\"type\": \"reset\",
+            \"label\": \"Clear\"
+		}]
+	},
+	\"statement_provider\": {
+		\"type\": \"list\",
+		\"items\": [{
+			\"type\": \"template\",
+			\"label\": \"<VariableAssignment>\",
+			\"name\": \"assign_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<ObjectAssignment>\",
+			\"name\": \"object_assign_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<ArrayAssignment>\",
+			\"name\": \"array_assign_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<If...then...>\",
+			\"name\": \"if_then_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<If...then...else...>\",
+			\"name\": \"if_then_else_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<ConditionalLoop>\",
+			\"name\": \"while_do_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<ArrayLoop>\",
+			\"name\": \"array_loop_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<ArrayElementFiltering>\",
+			\"name\": \"array_element_filter_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<AddToArray>\",
+			\"name\": \"array_add_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<UpdateArrayObjectByIndex>\",
+			\"name\": \"array_index_update_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<Code library>\",
+			\"name\": \"code_block_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"debugPrint\",
+			\"name\": \"debugPrint_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"Comment\",
+			\"name\": \"annotation_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"ReturnAndExit(return)\",
+			\"name\": \"return_template\"
+		}, {
+			\"type\": \"reset\",
+            \"label\": \"Clear\"
+		}]
+	},
+	
+	\"while_statement_provider\": {
+		\"type\": \"list\",
+		\"items\": [{
+			\"type\": \"template\",
+			\"label\": \"<VariableAssignment>\",
+			\"name\": \"assign_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<ObjectAssignment>\",
+			\"name\": \"object_assign_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<ArrayAssignment>\",
+			\"name\": \"array_assign_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<If...then...>\",
+			\"name\": \"if_then_while_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<If...then...else...>\",
+			\"name\": \"if_then_else_while_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<ConditionalLoop>\",
+			\"name\": \"while_do_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<ArrayLoop>\",
+			\"name\": \"array_loop_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<ArrayElementFiltering>\",
+			\"name\": \"array_element_filter_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<AddToArray>\",
+			\"name\": \"array_add_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<UpdateArrayObjectByIndex>\",
+			\"name\": \"array_index_update_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<Code library>\",
+			\"name\": \"code_block_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"debugPrint\",
+			\"name\": \"debugPrint_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"Comment\",
+			\"name\": \"annotation_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"ReturnAndExit(return)\",
+			\"name\": \"return_template\"
+		}, {
+			\"type\": \"reset\",
+            \"label\": \"Clear\"
+		}]
+	},
+	\"varprocess_statement_provider\": {
+		\"type\": \"list\",
+		\"items\": [{
+			\"type\": \"template\",
+			\"label\": \"<VariableAssignment>\",
+			\"name\": \"assign_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<ObjectAssignment>\",
+			\"name\": \"object_assign_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<ArrayAssignment>\",
+			\"name\": \"array_assign_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<If...then...>\",
+			\"name\": \"if_then_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<If...then...else...>\",
+			\"name\": \"if_then_else_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<ConditionalLoop>\",
+			\"name\": \"while_do_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<ArrayLoop>\",
+			\"name\": \"array_loop_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<ArrayElementFiltering>\",
+			\"name\": \"array_element_filter_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<AddToArray>\",
+			\"name\": \"array_add_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<UpdateArrayObjectByIndex>\",
+			\"name\": \"array_index_update_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"<Code library>\",
+			\"name\": \"code_block_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"debugPrint\",
+			\"name\": \"debugPrint_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"Comment\",
+			\"name\": \"annotation_template\"
+		}, {
+			\"type\": \"reset\",
+            \"label\": \"Clear\"
+		}]
+	},
+	\"element_statement_provider\": {
+		\"type\": \"list\",
+		\"items\": [{
+			\"type\": \"template\",
+			\"label\": \"<VariableAssignment>\",
+			\"name\": \"assign_template\"
+		}, {
+			\"type\": \"template\",
+			\"label\": \"ReturnAndExit(return)\",
+			\"name\": \"return_template\"
+		}, {
+			\"type\": \"reset\",
+            \"label\": \"Clear\"
+		}]
+	},
+	\"dateformat_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<date format>\",
+			\"provider\": \"dateformat_provider\"
+		}]
+	},
+	\"dateformat_provider\": {
+		\"type\": \"list\",
+		\"items\": [{
+			\"type\": \"text\",
+			\"label\": \"yyyy\",
+			\"value\": \"yyyy\"
+		}, {
+			\"type\": \"text\",
+			\"label\": \"MM\",
+			\"value\": \"MM\"
+		}, {
+			\"type\": \"text\",
+			\"label\": \"dd\",
+			\"value\": \"dd\"
+		}, {
+			\"type\": \"text\",
+			\"label\": \"yyyy-MM\",
+			\"value\": \"yyyy-MM\"
+		}, {
+			\"type\": \"text\",
+			\"label\": \"yyyy-MM-dd\",
+			\"value\": \"yyyy-MM-dd\"
+		}, {
+			\"type\": \"text\",
+			\"label\": \"yyyy/MM/dd\",
+			\"value\": \"yyyy/MM/dd\"
+		}, {
+			\"type\": \"text\",
+			\"label\": \"yyyyMMdd\",
+			\"value\": \"yyyyMMdd\"
+		}, {
+			\"type\": \"text\",
+			\"label\": \"yyyy-MM-dd HH:mm:ss\",
+			\"value\": \"yyyy-MM-dd HH:mm:ss\"
+		}, {
+			\"type\": \"text\",
+			\"label\": \"yyyy/MM/dd HH:mm:ss\",
+			\"value\": \"yyyy/MM/dd HH:mm:ss\"
+		}, {
+			\"type\": \"text\",
+			\"label\": \"yyyyMMddHHmmss\",
+			\"value\": \"yyyyMMddHHmmss\"
+		}, {
+			\"type\": \"text\",
+			\"label\": \"yyyy-MM-dd\",
+			\"value\": \"yyyy-MM-dd\"
+		}, {
+			\"type\": \"reset\",
+            \"label\": \"Clear\"
+		}]
+	},
+	\"round_type_template\": {
+		\"type\": \"part\",
+		\"parts\": [{
+			\"type\": \"placeholder\",
+			\"label\": \"<Rounding mode>\",
+			\"provider\": \"round_type_provider\"
+		}]
+	},
+	\"round_type_provider\": {
+		\"type\": \"list\",
+		\"items\": [{
+			\"type\": \"text\",
+			\"label\": \"round\",
+			\"value\": \"1\"
+		}, {
+			\"type\": \"text\",
+			\"label\": \"ceil\",
+			\"value\": \"2\"
+		}, {
+			\"type\": \"text\",
+			\"label\": \"floor\",
+			\"value\": \"3\"
+		}, {
+			\"type\": \"reset\",
+            \"label\": \"Clear\"
+		}]
+	},
+	\"data_provider_number\": {
+		\"type\": \"data\",
+		\"items\": []
+	},
+	\"data_provider_bool\": {
+		\"type\": \"data\",
+		\"items\": []
+	},
+	\"data_provider_date\": {
+		\"type\": \"data\",
+		\"items\": []
+	},
+	\"data_provider_string\": {
+		\"type\": \"data\",
+		\"items\": []
+	},
+	\"data_provider_array\": {
+		\"type\": \"data\",
+		\"object_could_choose\": \"1\",
+		\"items\": []
+	},
+	\"data_provider_leftValue\": {
+		\"type\": \"data\",
+		\"items\": []
+	},
+	\"data_provider_leftValue_array\": {
+		\"type\": \"data\",
+		\"object_could_choose\": \"1\",
+		\"items\": []
+	},
+	\"data_provider_local\": {
+		\"type\": \"data\",
+		\"items\": []
+	},
+	\"data_provider_object\": {
+		\"type\": \"data\",
+		\"object_could_choose\": \"1\",
+		\"items\": []
+	},
+	\"data_provider_object_array\": {
+		\"type\": \"data\",
+		\"object_could_choose\": \"1\",
+		\"items\": []
+	},
+	\"data_provider_leftValue_object\": {
+		\"type\": \"data\",
+		\"object_could_choose\": \"1\",
+		\"items\": []
+	},
+	\"data_provider_array_object\": {
+		\"type\": \"data\",
+		\"object_could_choose\": \"1\",
+		\"items\": []
+	},
+	\"data_provider_array_number\": {
+		\"type\": \"data\",
+		\"items\": []
+	},
+	\"data_provider_array_bool\": {
+		\"type\": \"data\",
+		\"items\": []
+	},
+	\"data_provider_array_date\": {
+		\"type\": \"data\",
+		\"items\": []
+	},
+	\"data_provider_array_string\": {
+		\"type\": \"data\",
+		\"items\": []
+	},
+	\"data_provider_exception_value\": {
+		\"type\": \"data\",
+		\"items\": []
+	},
+	\"data_provider_dict_value\": {
+		\"type\": \"data\",
+		\"items\": []
+	},
+	\"function_provider_number\": {
+		\"type\": \"list\",
+		\"items\": []
+	},
+	\"function_provider_string\": {
+		\"type\": \"list\",
+		\"items\": []
+	},
+	\"function_provider_bool\": {
+		\"type\": \"list\",
+		\"items\": []
+	},
+	\"function_provider_date\": {
+		\"type\": \"list\",
+		\"items\": []
+	},
+	\"function_provider_array\": {
+		\"type\": \"list\",
+		\"items\": []
+	},
+	\"function_provider_array_number\": {
+		\"type\": \"list\",
+		\"items\": []
+	},
+	\"function_provider_array_string\": {
+		\"type\": \"list\",
+		\"items\": []
+	},
+	\"function_provider_array_bool\": {
+		\"type\": \"list\",
+		\"items\": []
+	},
+	\"function_provider_array_date\": {
+		\"type\": \"list\",
+		\"items\": []
+	},
+	\"function_provider_array_object\": {
+		\"type\": \"list\",
+		\"items\": []
+	},
+	\"function_provider_object\": {
+		\"type\": \"list\",
+		\"items\": []
+	},
+	\"function_common_provider\": {
+		\"type\": \"list\",
+		\"items\": []
+	},
+	\"function_common_provider_string\": {
+		\"type\": \"list\",
+		\"items\": []
+	},
+	\"function_common_provider_number\": {
+		\"type\": \"list\",
+		\"items\": []
+	},
+	\"function_common_provider_date\": {
+		\"type\": \"list\",
+		\"items\": []
+	},
+	\"function_common_provider_bool\": {
+		\"type\": \"list\",
+		\"items\": []
+	},
+
+	\"roster_provider_type\": {
+		\"type\": \"list\",
+		\"items\": []
+	}
+
+}"

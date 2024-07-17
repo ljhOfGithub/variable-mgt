@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiseco.var.process.app.server.repository.UserComponetCodebaseRecordMapper">
+    <resultMap id="BaseResultMap" type="com.wiseco.var.process.app.server.repository.entity.UserComponetCodebaseRecord">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <result column="source_type" jdbcType="INTEGER" property="sourceType"/>
+        <result column="code_block_name" jdbcType="VARCHAR" property="codeBlockName"/>
+        <result column="code_block_content" jdbcType="VARCHAR" property="codeBlockContent"/>
+        <result column="code_block_describe" jdbcType="VARCHAR" property="codeBlockDescribe"/>
+        <result column="code_block_use_times" jdbcType="INTEGER" property="codeBlockUseTimes"/>
+        <result column="delete_flag" jdbcType="INTEGER" property="deleteFlag"/>
+        <result column="created_user" jdbcType="VARCHAR" property="createdUser"/>
+        <result column="updated_user" jdbcType="VARCHAR" property="updatedUser"/>
+        <result column="created_time" jdbcType="TIMESTAMP" property="createdTime"/>
+        <result column="updated_time" jdbcType="TIMESTAMP" property="updatedTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, user_id, code_block_name, code_block_content, code_block_describe, code_block_use_times,
+        delete_flag,source_type,
+        created_user, updated_user, created_time, updated_time
+    </sql>
+
+    <update id="updateUseTimes">
+        update user_componet_codebase_record
+        set code_block_use_times=code_block_use_times + 1
+        where id = #{codeBaseId}
+    </update>
+
+</mapper>

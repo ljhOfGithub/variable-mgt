@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiseco.var.process.app.server.repository.VarProcessOutsideRefMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wiseco.var.process.app.server.repository.entity.VarProcessOutsideRef">
+        <result column="id" property="id"/>
+        <result column="var_process_space_id" property="varProcessSpaceId"/>
+        <result column="outside_service_id" property="outsideServiceId"/>
+        <result column="name" property="name"/>
+        <result column="name_cn" property="nameCn"/>
+        <result column="input_parameter_bindings" property="inputParameterBindings"/>
+        <result column="created_user" property="createdUser"/>
+        <result column="updated_user" property="updatedUser"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        var_process_space_id, outside_service_id, name, name_cn, input_parameter_bindings, created_user, updated_user,
+        created_time, updated_time
+    </sql>
+
+    <resultMap id="VariableSpaceReferencedOutsideServiceInfo"
+               type="com.wiseco.var.process.app.server.service.dto.VariableSpaceReferencedOutsideServiceInfoDto">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="code" property="code"/>
+        <result column="type" property="type"/>
+        <result column="data_cache" property="dataCache"/>
+        <result column="data_cache_type" property="dataCacheType"/>
+        <result column="state" property="state"/>
+        <result column="ref_status" property="refStatus"/>
+    </resultMap>
+
+    <select id="getVariableSpaceReferencedOutsideServiceInfoPage" resultMap="VariableSpaceReferencedOutsideServiceInfo">
+        SELECT os.id,
+        os.name,
+        os.code,
+        os.type,
+        os.data_cache,
+        os.data_cache_type,
+        os.state,
+        IF(outside_service_refed_obj_num.num > 0, 1, 0) as ref_status
+        FROM outside_service os
+        INNER JOIN outside_service_domain osd
+        ON os.id = osd.outside_service_id AND osd.domain_id = #{spaceId} AND osd.space_type = 'variable'
+        LEFT JOIN (SELECT outside_service_id, COUNT(1) AS num
+        FROM var_process_outside_ref
+        WHERE var_process_space_id = #{spaceId}
+        GROUP BY outside_service_id) outside_service_refed_obj_num
+        ON osd.outside_service_id = outside_service_refed_obj_num.outside_service_id
+        WHERE os.state != 0
+        <!--外部服务状态-->
+        <if test="outsideServiceState != null and outsideServiceState.size() > 0">
+            AND os.state IN
+            <foreach collection="outsideServiceState" item="oss" open="(" separator="," close=")">
+                #{oss}
+            </foreach>
+        </if>
+        <!--外部服务引入状态-->
+        <if test="referenceState != null and referenceState.size() > 0">
+            AND IF(outside_service_refed_obj_num.num > 0, 1, 0) IN
+            <foreach collection="referenceState" item="rs" open="(" separator="," close=")">
+                #{rs}
+            </foreach>
+        </if>
+        <!--外部服务名称/编码关键词模糊搜索-->
+        <if test="keyword != null and keyword != ''">
+            AND (os.name LIKE concat('%',#{keyword},'%') OR os.code LIKE concat('%',#{keyword},'%'))
+        </if>
+    </select>
+
+    <select id="getVariableSpaceReferencedOutsideServiceReceiverObjectInfo"
+            resultType="com.wiseco.var.process.app.server.service.dto.VariableSpaceReferencedOutsideServiceReceiverObjectInfoDto">
+        SELECT os.name AS outsideServiceName,
+        vposr.name AS receiverObjectName,
+        vposr.name_cn AS receiverObjectLabel,
+        vposr.output_parameter_bindings AS outputParameterBindings
+        FROM outside_service os
+        INNER JOIN outside_service_domain osd
+        ON os.id = osd.outside_service_id AND osd.domain_id = #{spaceId} AND osd.space_type = 'variable'
+        LEFT JOIN (SELECT outside_service_id, COUNT(1) AS num
+        FROM var_process_outside_ref
+        WHERE var_process_space_id = #{spaceId}
+        GROUP BY outside_service_id) outside_service_refed_obj_num
+        ON osd.outside_service_id = outside_service_refed_obj_num.outside_service_id
+        INNER JOIN var_process_outside_ref vposr ON outside_service_refed_obj_num.outside_service_id =
+        vposr.outside_service_id
+        WHERE outside_service_refed_obj_num.num > 0
+        AND vposr.var_process_space_id = #{spaceId}
+    </select>
+
+    <select id="findByDataModelId"
+            resultType="com.wiseco.var.process.app.server.repository.entity.VarProcessOutsideRef">
+        SELECT vpor.outside_service_id, vpor.outside_service_code, vpor.outside_service_name
+        FROM var_process_outside_ref AS vpor
+        WHERE data_model_id = #{dataModelId}
+        ORDER BY id desc
+        LIMIT 1
+    </select>
+
+    <select id="findByDataModelId"
+            resultType="com.wiseco.var.process.app.server.repository.entity.VarProcessOutsideRef"
+            databaseId="sqlServer">
+        SELECT vpor.outside_service_id, vpor.outside_service_code, vpor.outside_service_name
+        FROM var_process_outside_ref AS vpor
+        WHERE data_model_id = #{dataModelId}
+        ORDER BY id desc
+        OFFSET 0 ROWS
+        FETCH NEXT 1 ROWS ONLY
+    </select>
+</mapper>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wiseco.var.process.app.server.repository.VarProcessBatchBacktrackingStatisticsConfigMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap"
+               type="com.wiseco.var.process.app.server.repository.entity.VarProcessBatchBacktrackingStatisticsConfig">
+        <result column="id" property="id"/>
+        <result column="batch_number" property="batchNumber"/>
+        <result column="backtracking_id" property="backtrackingId"/>
+        <result column="analysis_index" property="analysisIndex"/>
+        <result column="iv_config" property="ivConfig"/>
+        <result column="psi_config" property="psiConfig"/>
+        <result column="special_val_config" property="specialValConfig"/>
+        <result column="created_user" property="createdUser"/>
+        <result column="updated_user" property="updatedUser"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+    </resultMap>
+
+    <select id="findAccessConfig" resultType="java.lang.Long">
+        select vpbbsc.id from var_process_batch_backtracking_statistics_config vpbbsc
+        join var_process_batch_backtracking vpbb on vpbb.id = vpbbsc.backtracking_id
+        where vpbb.delete_flag = 1
+        <if test="deptCodes !=null and deptCodes.size() != 0">
+            AND vpbb.dept_code in
+            <foreach item="item" collection='deptCodes' open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        <if test="userNames !=null and userNames.size() != 0">
+            AND vpbb.created_user in
+            <foreach item="item" collection='userNames' open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+</mapper>

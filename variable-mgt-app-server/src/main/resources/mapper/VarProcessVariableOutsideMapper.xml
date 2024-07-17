@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiseco.var.process.app.server.repository.VarProcessVariableOutsideMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wiseco.var.process.app.server.repository.entity.VarProcessVariableOutside">
+        <result column="id" property="id"/>
+        <result column="var_process_space_id" property="varProcessSpaceId"/>
+        <result column="variable_id" property="variableId"/>
+        <result column="outside_service_id" property="outsideServiceId"/>
+        <result column="outside_service_ref_name" property="outsideServiceRefName"/>
+        <result column="created_user" property="createdUser"/>
+        <result column="updated_user" property="updatedUser"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        var_process_space_id, variable_id, outside_service_id, outside_service_ref_name, created_user, updated_user,
+        created_time, updated_time
+    </sql>
+
+    <select id="getOutsideServiceList"
+            resultType="com.wiseco.var.process.app.server.service.dto.VariableOutsideServiceDto">
+        SELECT vos.variable_id,vpv.name as variableName,vpv.label as variableLabel,vpv.data_type as dataType, os.name as
+        serviceName,code as serviceCode,osr.input_parameter_bindings
+        from var_process_variable_outside vos
+        INNER JOIN var_process_outside_ref osr ON vos.outside_service_id = osr.outside_service_id and
+        vos.var_process_space_id=osr.var_process_space_id
+        INNER JOIN outside_service os ON os.id = osr.outside_service_id
+        INNER JOIN var_process_variable vpv ON vpv.id = vos.variable_id
+        WHERE vos.var_process_space_id=#{spaceId}
+        and vos.variable_id in
+        <foreach collection="variableIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+</mapper>

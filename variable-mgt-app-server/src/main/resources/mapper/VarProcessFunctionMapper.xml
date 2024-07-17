@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiseco.var.process.app.server.repository.VarProcessFunctionMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wiseco.var.process.app.server.repository.entity.VarProcessFunction">
+        <result column="id" property="id"/>
+        <result column="var_process_space_id" property="varProcessSpaceId"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="identifier" property="identifier"/>
+        <result column="name" property="name"/>
+        <result column="function_type" property="functionType"/>
+        <result column="description" property="description"/>
+        <result column="status" property="status"/>
+        <result column="delete_flag" property="deleteFlag"/>
+        <result column="function_data_type" property="functionDataType"/>
+        <result column="content" property="content"/>
+        <result column="function_entry_content" property="functionEntryContent"/>
+        <result column="created_dept" property="createdDept"/>
+        <result column="created_dept_code" property="createdDeptCode"/>
+        <result column="created_user" property="createdUser"/>
+        <result column="updated_user" property="updatedUser"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        var_process_space_id, parent_id, identifier, name, function_type, description, status, delete_flag, function_data_type, content, function_entry_content, created_dept, created_dept_code, created_user, updated_user, created_time, updated_time
+    </sql>
+
+    <select id="findFunctionList" parameterType="com.wiseco.var.process.app.server.service.dto.FunctionQueryDto"
+            resultType="com.wiseco.var.process.app.server.service.dto.FunctionDetailDto">
+        SELECT vpf.id,
+        vpf.name,
+        vpf.identifier,
+        vpf.prep_object_name,
+        vpf.created_time,
+        vpf.status,
+        vpf.created_dept,
+        vpf.created_dept_code,
+        vpf.created_user,
+        vpf.updated_time,
+        vpf.updated_user,
+        vpf.category_id,
+        vpf.handle_type,
+        vpf.function_entry_content,
+        vpf.function_data_type,
+        vpf.variable_created,
+        <if test="queryDto.functionType != null and queryDto.functionType == 'FUNCTION'">
+            (IFNULL(function_usage.function_usage, 0) + IFNULL(interface_usage.interface_usage, 0)) AS is_use,
+        </if>
+        <if test="queryDto.functionType != null and queryDto.functionType == 'PREP'">
+            IFNULL(interface_usage.interface_usage, 0) AS is_use,
+        </if>
+        <if test="queryDto.functionType != null and queryDto.functionType == 'TEMPLATE'">
+            IFNULL(variable_usage.variable_usage, 0)   AS is_use,
+        </if>
+        IFNULL(test_results.is_test, 0) AS is_test
+        FROM var_process_function vpf
+        -- 变量-函数使用情况
+        LEFT JOIN (SELECT vpvf.function_id AS function_id, IF(COUNT(vpvf.function_id) > 0, true, false) AS variable_usage
+        FROM var_process_function vpf1 INNER JOIN var_process_variable_function vpvf ON vpf1.id = vpvf.function_id
+        GROUP BY vpvf.function_id) variable_usage ON vpf.id = variable_usage.function_id
+        -- 函数-函数使用情况
+        LEFT JOIN (SELECT vprf.function_id AS function_id, IF(COUNT(vprf.use_by_function_id) > 0, true, false) AS function_usage
+        FROM var_process_function vpf2 INNER JOIN var_process_function_reference vprf ON vpf2.id = vprf.function_id
+        GROUP BY vprf.function_id) function_usage ON vpf.id = function_usage.function_id
+        -- 接口-函数使用情况
+        LEFT JOIN (SELECT vpif.identifier AS function_identifier, IF(COUNT(vpif.identifier) > 0, true, false) AS interface_usage
+        FROM var_process_function vpf3 INNER JOIN var_process_manifest_function vpif ON vpf3.identifier = vpif.identifier
+        GROUP BY vpif.identifier) interface_usage ON vpf.identifier = interface_usage.function_identifier
+        -- 是否测试
+        LEFT JOIN (SELECT test.identifier AS identifier, IF(COUNT(test_results.test_id) > 0, true, false) AS is_test
+        FROM var_process_function vpf4
+        INNER JOIN var_process_test test ON vpf4.identifier = test.identifier and test.delete_flag = true
+        INNER JOIN var_process_test_results test_results ON test.id = test_results.test_id
+        GROUP BY test.identifier) test_results ON vpf.identifier = test_results.identifier
+        <where>
+            vpf.delete_flag = 1
+            AND vpf.var_process_space_id = #{queryDto.spaceId}
+            <if test="queryDto.name != null and queryDto.name != ''">
+                AND vpf.name LIKE concat('%',#{queryDto.name},'%')
+            </if>
+
+            <if test="queryDto.functionType != null">
+                AND vpf.function_type = #{queryDto.functionType}
+            </if>
+
+            <if test="queryDto.dataModelName != null and queryDto.dataModelName != ''">
+                AND vpf.prep_object_name = #{queryDto.dataModelName}
+            </if>
+
+            <if test="queryDto.functionStatus != null">
+                AND vpf.status = #{queryDto.functionStatus}
+            </if>
+
+            <if test="queryDto.isUse != null">
+                    AND
+                    <if test="queryDto.functionType != null and queryDto.functionType == 'FUNCTION'">
+                         IFNULL(function_usage.function_usage, false) = #{queryDto.isUse}
+                    </if>
+                    <if test="queryDto.functionType != null and queryDto.functionType == 'PREP'">
+                         IFNULL(interface_usage.interface_usage, false) = #{queryDto.isUse}
+                    </if>
+                    <if test="queryDto.functionType != null and queryDto.functionType == 'TEMPLATE'">
+                          IFNULL(variable_usage.variable_usage, false) = #{queryDto.isUse}
+                    </if>
+            </if>
+
+            <if test="queryDto.isTest != null">
+                AND IFNULL(test_results.is_test, false) = #{queryDto.isTest}
+            </if>
+
+            <if test="queryDto.createdDeptCode != null and queryDto.createdDeptCode != ''">
+                AND vpf.created_dept_code = #{queryDto.createdDeptCode}
+            </if>
+
+            <if test="queryDto.categoryIdList != null and queryDto.categoryIdList.size()>0">
+                AND vpf.category_id in
+                <foreach collection="queryDto.categoryIdList" item="categoryId" open="(" separator="," close=")">
+                    #{categoryId}
+                </foreach>
+            </if>
+
+            <if test="queryDto.handleType != null">
+                AND vpf.handle_type = #{queryDto.handleType}
+            </if>
+
+            <if test="queryDto.deptCodes !=null and queryDto.deptCodes.size() != 0">
+                AND created_dept_code in
+                <foreach item="item" collection='queryDto.deptCodes' open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+            <if test="queryDto.userNames !=null and queryDto.userNames.size() != 0">
+                AND created_user in
+                <foreach item="item" collection='queryDto.userNames' open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        ORDER BY ${queryDto.sortKey} ${queryDto.sortType}, vpf.updated_time DESC, vpf.id DESC
+    </select>
+
+    <select id="findFunctionList" parameterType="com.wiseco.var.process.app.server.service.dto.FunctionQueryDto"
+            resultType="com.wiseco.var.process.app.server.service.dto.FunctionDetailDto"
+            databaseId="sqlServer">
+        SELECT vpf.id,
+        vpf.name,
+        vpf.identifier,
+        vpf.prep_object_name,
+        vpf.created_time,
+        vpf.status,
+        vpf.created_dept,
+        vpf.created_dept_code,
+        vpf.created_user,
+        vpf.updated_time,
+        vpf.updated_user,
+        vpf.category_id,
+        vpf.handle_type,
+        vpf.function_entry_content,
+        vpf.function_data_type,
+        vpf.variable_created,
+        <if test="queryDto.functionType != null and queryDto.functionType == 'FUNCTION'">
+            (ISNULL(function_usage.function_usage, 0) + ISNULL(interface_usage.interface_usage, 0)) AS is_use,
+        </if>
+        <if test="queryDto.functionType != null and queryDto.functionType == 'PREP'">
+            ISNULL(interface_usage.interface_usage, 0) AS is_use,
+        </if>
+        <if test="queryDto.functionType != null and queryDto.functionType == 'TEMPLATE'">
+            ISNULL(variable_usage.variable_usage, 0)   AS is_use,
+        </if>
+        ISNULL(test_results.is_test, 0) AS is_test
+        FROM var_process_function vpf
+        -- 变量-函数使用情况
+        LEFT JOIN (SELECT vpvf.function_id AS function_id, IIF(COUNT(vpvf.function_id) > 0, 1, 0) AS variable_usage
+        FROM var_process_function vpf1 INNER JOIN var_process_variable_function vpvf ON vpf1.id = vpvf.function_id
+        GROUP BY vpvf.function_id) variable_usage ON vpf.id = variable_usage.function_id
+        -- 函数-函数使用情况
+        LEFT JOIN (SELECT vprf.function_id AS function_id, IIF(COUNT(vprf.use_by_function_id) > 0, 1, 0) AS function_usage
+        FROM var_process_function vpf2 INNER JOIN var_process_function_reference vprf ON vpf2.id = vprf.function_id
+        GROUP BY vprf.function_id) function_usage ON vpf.id = function_usage.function_id
+        -- 接口-函数使用情况
+        LEFT JOIN (SELECT vpif.identifier AS function_identifier, IIF(COUNT(vpif.identifier) > 0, 1, 0) AS interface_usage
+        FROM var_process_function vpf3 INNER JOIN var_process_manifest_function vpif ON vpf3.identifier = vpif.identifier
+        GROUP BY vpif.identifier) interface_usage ON vpf.identifier = interface_usage.function_identifier
+        -- 是否测试
+        LEFT JOIN (SELECT test.identifier AS identifier, IIF(COUNT(test_results.test_id) > 0, 1, 0) AS is_test
+        FROM var_process_function vpf4
+        INNER JOIN var_process_test test ON vpf4.identifier = test.identifier and test.delete_flag = 1
+        INNER JOIN var_process_test_results test_results ON test.id = test_results.test_id
+        GROUP BY test.identifier) test_results ON vpf.identifier = test_results.identifier
+        <where>
+            vpf.delete_flag = 1
+            AND vpf.var_process_space_id = #{queryDto.spaceId}
+            <if test="queryDto.name != null and queryDto.name != ''">
+                AND vpf.name LIKE concat('%',#{queryDto.name},'%')
+            </if>
+
+            <if test="queryDto.functionType != null">
+                AND vpf.function_type = #{queryDto.functionType}
+            </if>
+
+            <if test="queryDto.dataModelName != null and queryDto.dataModelName != ''">
+                AND vpf.prep_object_name = #{queryDto.dataModelName}
+            </if>
+
+            <if test="queryDto.functionStatus != null">
+                AND vpf.status = #{queryDto.functionStatus}
+            </if>
+
+            <if test="queryDto.isUse != null">
+                AND
+                <if test="queryDto.functionType != null and queryDto.functionType == 'FUNCTION'">
+                    ISNULL(function_usage.function_usage, 0) = #{queryDto.isUse}
+                </if>
+                <if test="queryDto.functionType != null and queryDto.functionType == 'PREP'">
+                    ISNULL(interface_usage.interface_usage, 0) = #{queryDto.isUse}
+                </if>
+                <if test="queryDto.functionType != null and queryDto.functionType == 'TEMPLATE'">
+                    ISNULL(variable_usage.variable_usage, 0) = #{queryDto.isUse}
+                </if>
+            </if>
+
+            <if test="queryDto.isTest != null">
+                AND ISNULL(test_results.is_test, 0) = #{queryDto.isTest}
+            </if>
+
+            <if test="queryDto.createdDeptCode != null and queryDto.createdDeptCode != ''">
+                AND vpf.created_dept_code = #{queryDto.createdDeptCode}
+            </if>
+
+            <if test="queryDto.categoryIdList != null and queryDto.categoryIdList.size()>0">
+                AND vpf.category_id in
+                <foreach collection="queryDto.categoryIdList" item="categoryId" open="(" separator="," close=")">
+                    #{categoryId}
+                </foreach>
+            </if>
+
+            <if test="queryDto.handleType != null">
+                AND vpf.handle_type = #{queryDto.handleType}
+            </if>
+
+            <if test="queryDto.deptCodes !=null and queryDto.deptCodes.size() != 0">
+                AND created_dept_code in
+                <foreach item="item" collection='queryDto.deptCodes' open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+            <if test="queryDto.userNames !=null and queryDto.userNames.size() != 0">
+                AND created_user in
+                <foreach item="item" collection='queryDto.userNames' open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        ORDER BY ${queryDto.sortKey} ${queryDto.sortType},
+        <if test="queryDto.sortKey != 'updated_time'">
+            vpf.updated_time DESC,
+        </if>
+        vpf.id DESC
+    </select>
+
+    <select id="selectFunctions"
+            resultType="com.wiseco.var.process.app.server.service.dto.VarProcessFunctionDto">
+        select id, identifier, name, function_entry_content
+        from var_process_function
+        where delete_flag = 1
+          and var_process_space_id = #{spaceId}
+          and function_type = #{functionType}
+          and status = #{functionStatus}
+
+        <if test="deptCodes != null and deptCodes.size()!=0">
+            and created_dept_code in
+            <foreach collection="deptCodes" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        <if test="userNames != null and userNames.size()!=0">
+            and created_user in
+            <foreach collection="userNames" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="selectFunctionsNew"
+            resultType="com.wiseco.var.process.app.server.service.dto.VarProcessFunctionDto">
+        select id, identifier, name, function_entry_content
+        from var_process_function
+        where delete_flag = 1
+          and var_process_space_id = #{spaceId}
+          and function_type = #{functionType}
+          and status = #{functionStatus}
+          and function_data_type = #{functionDataType}
+
+        <if test="deptCodes != null and deptCodes.size()!=0">
+            and created_dept_code in
+            <foreach collection="deptCodes" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        <if test="userNames != null and userNames.size()!=0">
+            and created_user in
+            <foreach collection="userNames" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+</mapper>

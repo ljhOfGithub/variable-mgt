@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>variable-mgt-app</artifactId>
+        <groupId>com.wiseco.decision.var</groupId>
+        <version>20240630-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>variable-mgt-app-sdk</artifactId>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <main.user.dir>${basedir}/..</main.user.dir>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>1.6.3</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.wiseco.boot</groupId>
+            <artifactId>wiseco-boot</artifactId>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.5</version>
+                <configuration>
+                    <useDefaultDelimiters>false</useDefaultDelimiters>
+                    <delimiters>
+                        <delimiter>$</delimiter>
+                    </delimiters>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+            <!-- wiseco-code-encrypt-import -->
+        </plugins>
+    </build>
+    <profiles>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <env>prod</env>
+                <!-- code encrypt setting -->
+                <wiseco.code.encrypt.expiry>2099-08-05</wiseco.code.encrypt.expiry>
+                <wiseco.code.encrypt.version>2_0_0</wiseco.code.encrypt.version>
+                <wiseco.code.encrypt.customer.name>zgc-bank</wiseco.code.encrypt.customer.name>
+                <wiseco.code.encrypt.random.seed>wiseco tech 2022</wiseco.code.encrypt.random.seed>
+            </properties>
+        </profile>
+    </profiles>
+</project>

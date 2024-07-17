@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiseco.var.process.app.server.repository.VarProcessServiceDomainMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wiseco.var.process.app.server.repository.entity.VarProcessServiceDomain">
+        <result column="id" property="id"/>
+        <result column="var_process_space_id" property="varProcessSpaceId"/>
+        <result column="service_id" property="serviceId"/>
+        <result column="domain_id" property="domainId"/>
+        <result column="created_user" property="createdUser"/>
+        <result column="updated_user" property="updatedUser"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        var_process_space_id, manifest_id, domain_id, created_user, updated_user, created_time, updated_time
+    </sql>
+    <select id="findVariableServiceAuthorizationInfoPage"
+            resultType="com.wiseco.var.process.app.server.service.dto.VariableServiceAuthorizationInfoDto">
+        SELECT vpsd.id AS recordId,
+        d.id AS domainId,
+        d.code AS domainCode,
+        d.name AS domainName,
+        vpsd.created_time AS authorizeTime,
+        CASE WHEN(SELECT COUNT(1)
+        FROM var_process_service_ref_object vpsro
+        INNER JOIN ds_strategy str ON vpsro.strategy_id = str.id AND str.status != 9
+        INNER JOIN domain_data_model ddm ON str.data_model_id = ddm.id AND ddm.delete_flag = 1
+        WHERE ddm.domain_id = vpsd.domain_id
+        AND vpsd.service_id = vpsro.service_id) > 0 THEN 1 ELSE 0 END AS referencedFlag,
+        (SELECT vpsro.created_time
+        FROM var_process_service_ref_object vpsro
+        INNER JOIN ds_strategy str ON vpsro.strategy_id = str.id AND str.status != 9
+        INNER JOIN domain_data_model ddm ON str.data_model_id = ddm.id AND ddm.delete_flag = 1
+        WHERE ddm.domain_id = vpsd.domain_id
+        AND vpsd.service_id = vpsro.service_id
+        ORDER BY created_time
+        LIMIT 1) AS firstReferenceTime
+        FROM var_process_service_domain vpsd
+        INNER JOIN domain d ON vpsd.domain_id = d.id AND d.delete_flag = 1 AND d.type = 1
+        WHERE vpsd.service_id = #{serviceId}
+        <if test="keywords != null and keywords != ''">
+            AND (d.name LIKE concat('%', #{keywords}, '%') OR d.code LIKE concat('%', #{keywords}, '%'))
+        </if>
+    </select>
+
+</mapper>

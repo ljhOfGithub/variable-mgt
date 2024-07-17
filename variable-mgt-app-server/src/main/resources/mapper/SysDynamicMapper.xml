@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiseco.var.process.app.server.repository.SysDynamicMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wiseco.var.process.app.server.repository.entity.SysDynamic">
+        <result column="id" property="id"/>
+        <result column="space_type" property="spaceType"/>
+        <result column="space_business_id" property="spaceBusinessId"/>
+        <result column="operate_type" property="operateType"/>
+        <result column="strategy_id" property="strategyId"/>
+        <result column="business_type" property="businessType"/>
+        <result column="business_bucket" property="businessBucket"/>
+        <result column="business_id" property="businessId"/>
+        <result column="permission_resources_id" property="permissionResourcesId"/>
+        <result column="permission_resources_code" property="permissionResourcesCode"/>
+        <result column="business_content" property="businessContent"/>
+        <result column="created_user" property="createdUser"/>
+        <result column="updated_user" property="updatedUser"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        space_type, space_business_id, operate_type, strategy_id, business_type, business_bucket, business_id,
+        permission_resources_id, permission_resources_code, business_content, created_user, updated_user, created_time,
+        updated_time
+    </sql>
+
+    <select id="findListByCreatedTime" resultType="com.wiseco.var.process.app.server.repository.entity.SysDynamic">
+
+        SELECT id,
+        space_type,
+        space_business_id,
+        strategy_id,
+        permission_resources_code,
+        permission_resources_id
+        FROM sys_dynamic
+        WHERE created_time BETWEEN #{startTime} and NOW()
+        and business_type != 'sys_log'
+        ORDER BY id desc
+        LIMIT ${dynamicCount}
+
+    </select>
+
+    <select id="findList" resultType="com.wiseco.var.process.app.server.repository.entity.SysDynamic">
+
+        SELECT
+        id,operate_type,business_bucket,space_name,decision_name,bucket_name,
+        strategy_name,business_content,created_user,created_time
+        FROM sys_dynamic
+        where id in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        order by created_time desc
+    </select>
+
+
+    <select id="findMainSysDynamic" parameterType="com.wiseco.var.process.app.server.service.dto.SysDynamicQueryDto"
+            resultType="com.wiseco.var.process.app.server.repository.entity.SysDynamic">
+        SELECT space_type,
+        space_business_id,
+        space_name,
+        operate_type,
+        strategy_id,
+        business_type,
+        business_bucket,
+        business_id,
+        permission_resources_id,
+        permission_resources_code,
+        decision_name,
+        bucket_name,
+        strategy_name,
+        business_content,
+        created_user,
+        updatedUser,
+        status
+        FROM sys_dynamic
+        where id in(
+        SELECT
+        DISTINCT sd.id
+        from (
+        SELECT
+        id,permission_resources_code,permission_resources_id
+        FROM sys_dynamic
+        WHERE created_time BETWEEN #{queryDto.startTime} and NOW()
+        ORDER BY id desc LIMIT ${queryDto.dynamicCount}
+        ) sd
+        INNER JOIN permission_role_resources prr ON prr.resources_code=sd.permission_resources_code and
+        prr.resources_id=sd.permission_resources_id
+        WHERE prr.role_id in
+        <foreach collection="queryDto.roleIds" item="roleId" open="(" separator="," close=")">
+            #{roleId}
+        </foreach>
+
+        )
+        or space_type = #{queryDto.spaceType}
+        order by id desc
+
+    </select>
+
+
+    <select id="findSysDynamic" parameterType="com.wiseco.var.process.app.server.service.dto.SysDynamicQueryDto"
+            resultType="com.wiseco.var.process.app.server.repository.entity.SysDynamic">
+        SELECT sd.* FROM (
+        SELECT space_type,
+        space_business_id,
+        space_name,
+        operate_type,
+        strategy_id,
+        business_type,
+        business_bucket,
+        business_id,
+        permission_resources_id,
+        permission_resources_code,
+        decision_name,
+        bucket_name,
+        strategy_name,
+        business_content,
+        created_user,
+        updatedUser,
+        status
+        FROM sys_dynamic
+        WHERE created_time BETWEEN #{queryDto.startTime} and NOW()
+        ORDER BY id desc LIMIT ${queryDto.dynamicCount}
+        ) sd
+        INNER JOIN (
+        SELECT DISTINCT resources_code,resources_id from permission_role_resources WHERE role_id in
+        <foreach collection="queryDto.roleIds" item="roleId" open="(" separator="," close=")">
+            #{roleId}
+        </foreach>
+
+        ) prr ON prr.resources_code=sd.permission_resources_code and prr.resources_id=sd.permission_resources_id
+
+        <where>
+
+            <if test="queryDto.spaceType != null and queryDto.spaceType!=''">
+                AND sd.space_type = #{queryDto.spaceType}
+            </if>
+
+            <if test="queryDto.spaceBusinessId != null and queryDto.spaceBusinessId!=''">
+                AND sd.space_business_id = #{queryDto.spaceBusinessId}
+            </if>
+
+            <if test="queryDto.strategyId != null and queryDto.strategyId!=''">
+                AND sd.strategy_id = #{queryDto.strategyId}
+            </if>
+
+        </where>
+        order by sd.id desc
+
+    </select>
+
+</mapper>

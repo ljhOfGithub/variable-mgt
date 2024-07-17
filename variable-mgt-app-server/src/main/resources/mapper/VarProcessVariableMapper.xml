@@ -1,0 +1,642 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiseco.var.process.app.server.repository.VarProcessVariableMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wiseco.var.process.app.server.repository.entity.VarProcessVariable">
+        <result column="id" property="id"/>
+        <result column="var_process_space_id" property="varProcessSpaceId"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="identifier" property="identifier"/>
+        <result column="name" property="name"/>
+        <result column="label" property="label"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="description" property="description"/>
+        <result column="version" property="version"/>
+        <result column="status" property="status"/>
+        <result column="delete_flag" property="deleteFlag"/>
+        <result column="content" property="content"/>
+        <result column="created_user" property="createdUser"/>
+        <result column="updated_user" property="updatedUser"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id
+        ,
+        var_process_space_id, parent_id, identifier, name, label, category_id, description, version, status,
+        delete_flag, content, created_user, updated_user, created_time, updated_time
+    </sql>
+
+    <select id="findVariableMaxVersionList"
+            parameterType="com.wiseco.var.process.app.server.service.dto.VariableQueryDto"
+            resultType="com.wiseco.var.process.app.server.service.dto.VariableDetailDto">
+
+        SELECT
+        vpv.id,vpv.var_process_space_id, vpv.identifier, vpv.name, vpv.label, vpv.category_id,vpv.dept_code,vpv.data_type,
+        vpv.version, vpv.status,vpv.description,vpv.processing_method,
+        vpv.created_user, vpv.updated_user, vpv.created_time, vpv.updated_time
+        FROM var_process_variable vpv
+        INNER JOIN (
+        SELECT identifier,max(version) as version from var_process_variable v
+        LEFT JOIN var_process_variable_tag t on v.id=t.variable_id and v.var_process_space_id=t.var_process_space_id
+        <where>
+            v.delete_flag=1
+            <if test="queryDto.spaceId != null and queryDto.spaceId!=''">
+                AND v.var_process_space_id = #{queryDto.spaceId}
+            </if>
+
+            <if test="queryDto.categoryIdList != null and queryDto.categoryIdList.size()>0">
+                and v.category_id in
+                <foreach collection="queryDto.categoryIdList" item="categoryId" open="(" separator="," close=")">
+                    #{categoryId}
+                </foreach>
+            </if>
+
+            <if test="queryDto.isUse != null and queryDto.isUse == 1">
+                and v.id in (SELECT variable_id from var_process_manifest_variable WHERE
+                var_process_space_id=#{queryDto.spaceId})
+            </if>
+            <if test="queryDto.isUse != null and queryDto.isUse == 0">
+                and v.id not in (SELECT variable_id from var_process_manifest_variable WHERE
+                var_process_space_id=#{queryDto.spaceId})
+            </if>
+
+            <if test="queryDto.tested != null and queryDto.tested == 1">
+                and v.id in (select inner_r.variable_id from var_process_test_results inner_r inner join
+                var_process_test inner_t on inner_r.test_id=inner_t.id where inner_r.test_type=1 and
+                inner_t.delete_flag=1 and inner_t.test_type=1 and inner_t.var_process_space_id=#{queryDto.spaceId})
+            </if>
+            <if test="queryDto.tested != null and queryDto.tested == 0">
+                and v.id not in (select inner_r.variable_id from var_process_test_results inner_r inner join
+                var_process_test inner_t on inner_r.test_id=inner_t.id where inner_r.test_type=1 and
+                inner_t.delete_flag=1 and inner_t.test_type=1 and inner_t.var_process_space_id=#{queryDto.spaceId})
+            </if>
+
+            <if test="queryDto.dataTypeList != null and queryDto.dataTypeList.size()>0">
+                and v.data_type in
+                <foreach collection="queryDto.dataTypeList" item="dataType" open="(" separator="," close=")">
+                    #{dataType}
+                </foreach>
+            </if>
+
+            <if test="queryDto.statusList != null and queryDto.statusList.size()>0">
+                and v.status in
+                <foreach collection="queryDto.statusList" item="status" open="(" separator="," close=")">
+                    #{status}
+                </foreach>
+            </if>
+
+            <if test="queryDto.keywords != null and queryDto.keywords!=''">
+                AND (v.name like CONCAT(concat('%',#{queryDto.keywords}),'%') or v.label like
+                CONCAT(concat('%',#{queryDto.keywords}),'%') )
+            </if>
+            <if test="queryDto.tagGroupId != null and queryDto.tagGroupId!=''">
+                AND t.tag_group_id = #{queryDto.tagGroupId}
+            </if>
+            <if test="queryDto.tagName != null and queryDto.tagName!=''">
+                AND t.tag_name = #{queryDto.tagName}
+            </if>
+            <if test="queryDto.deptCode != null and queryDto.deptCode != ''">
+                AND v.dept_code = #{queryDto.deptCode}
+            </if>
+            <if test="queryDto.varTemplateKeyWord != null and queryDto.varTemplateKeyWord!=''">
+                AND v.id in (select in_vf.variable_id from var_process_variable_function in_vf
+                INNER JOIN var_process_function in_f on in_vf.function_id=in_f.id
+                where in_f.function_type='TEMPLATE' and in_f.delete_flag=1 and in_f.name like CONCAT('%', #{queryDto.varTemplateKeyWord}, '%'))
+            </if>
+
+            <if test="queryDto.deptCodes != null and queryDto.deptCodes.size()!=0">
+                and v.dept_code in
+                <foreach collection="queryDto.deptCodes" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+            <if test="queryDto.userNames != null and queryDto.userNames.size()!=0">
+                and v.created_user in
+                <foreach collection="queryDto.userNames" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+            <if test="queryDto.processingMethod != null">
+                and v.processing_method = #{queryDto.processingMethod}
+            </if>
+        </where>
+
+        GROUP BY v.identifier
+        ) vpvg ON vpv.identifier=vpvg.identifier and vpv.version=vpvg.version
+        where vpv.delete_flag=1
+        AND vpv.var_process_space_id = #{queryDto.spaceId}
+        order by ${queryDto.sortKey} ${queryDto.sortType}, updated_time desc, vpv.id desc
+
+    </select>
+
+    <select id="findVariableMaxVersionList"
+            parameterType="com.wiseco.var.process.app.server.service.dto.VariableQueryDto"
+            resultType="com.wiseco.var.process.app.server.service.dto.VariableDetailDto"
+            databaseId="sqlServer">
+
+        SELECT
+        vpv.id,vpv.var_process_space_id, vpv.identifier, vpv.name, vpv.label, vpv.category_id,vpv.dept_code,vpv.data_type,
+        vpv.version, vpv.status,vpv.description,vpv.processing_method,
+        vpv.created_user, vpv.updated_user, vpv.created_time, vpv.updated_time
+        FROM var_process_variable vpv
+        INNER JOIN (
+        SELECT identifier,max(version) as version from var_process_variable v
+        LEFT JOIN var_process_variable_tag t on v.id=t.variable_id and v.var_process_space_id=t.var_process_space_id
+        <where>
+            v.delete_flag=1
+            <if test="queryDto.spaceId != null and queryDto.spaceId!=''">
+                AND v.var_process_space_id = #{queryDto.spaceId}
+            </if>
+
+            <if test="queryDto.categoryIdList != null and queryDto.categoryIdList.size()>0">
+                and v.category_id in
+                <foreach collection="queryDto.categoryIdList" item="categoryId" open="(" separator="," close=")">
+                    #{categoryId}
+                </foreach>
+            </if>
+
+            <if test="queryDto.isUse != null and queryDto.isUse == 1">
+                and v.id in (SELECT variable_id from var_process_manifest_variable WHERE
+                var_process_space_id=#{queryDto.spaceId})
+            </if>
+            <if test="queryDto.isUse != null and queryDto.isUse == 0">
+                and v.id not in (SELECT variable_id from var_process_manifest_variable WHERE
+                var_process_space_id=#{queryDto.spaceId})
+            </if>
+
+            <if test="queryDto.tested != null and queryDto.tested == 1">
+                and v.id in (select inner_r.variable_id from var_process_test_results inner_r inner join
+                var_process_test inner_t on inner_r.test_id=inner_t.id where inner_r.test_type=1 and
+                inner_t.delete_flag=1 and inner_t.test_type=1 and inner_t.var_process_space_id=#{queryDto.spaceId})
+            </if>
+            <if test="queryDto.tested != null and queryDto.tested == 0">
+                and v.id not in (select inner_r.variable_id from var_process_test_results inner_r inner join
+                var_process_test inner_t on inner_r.test_id=inner_t.id where inner_r.test_type=1 and
+                inner_t.delete_flag=1 and inner_t.test_type=1 and inner_t.var_process_space_id=#{queryDto.spaceId})
+            </if>
+
+            <if test="queryDto.dataTypeList != null and queryDto.dataTypeList.size()>0">
+                and v.data_type in
+                <foreach collection="queryDto.dataTypeList" item="dataType" open="(" separator="," close=")">
+                    #{dataType}
+                </foreach>
+            </if>
+
+            <if test="queryDto.statusList != null and queryDto.statusList.size()>0">
+                and v.status in
+                <foreach collection="queryDto.statusList" item="status" open="(" separator="," close=")">
+                    #{status}
+                </foreach>
+            </if>
+
+            <if test="queryDto.keywords != null and queryDto.keywords!=''">
+                AND (v.name like CONCAT(concat('%',#{queryDto.keywords}),'%') or v.label like
+                CONCAT(concat('%',#{queryDto.keywords}),'%') )
+            </if>
+            <if test="queryDto.tagGroupId != null and queryDto.tagGroupId!=''">
+                AND t.tag_group_id = #{queryDto.tagGroupId}
+            </if>
+            <if test="queryDto.tagName != null and queryDto.tagName!=''">
+                AND t.tag_name = #{queryDto.tagName}
+            </if>
+            <if test="queryDto.deptCode != null and queryDto.deptCode != ''">
+                AND v.dept_code = #{queryDto.deptCode}
+            </if>
+            <if test="queryDto.varTemplateKeyWord != null and queryDto.varTemplateKeyWord!=''">
+                AND v.id in (select in_vf.variable_id from var_process_variable_function in_vf
+                INNER JOIN var_process_function in_f on in_vf.function_id=in_f.id
+                where in_f.function_type='TEMPLATE' and in_f.delete_flag=1 and in_f.name like CONCAT('%', #{queryDto.varTemplateKeyWord}, '%'))
+            </if>
+
+            <if test="queryDto.deptCodes != null and queryDto.deptCodes.size()!=0">
+                and v.dept_code in
+                <foreach collection="queryDto.deptCodes" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+            <if test="queryDto.userNames != null and queryDto.userNames.size()!=0">
+                and v.created_user in
+                <foreach collection="queryDto.userNames" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+            <if test="queryDto.processingMethod != null">
+                and v.processing_method = #{queryDto.processingMethod}
+            </if>
+        </where>
+
+        GROUP BY v.identifier
+        ) vpvg ON vpv.identifier=vpvg.identifier and vpv.version=vpvg.version
+        where vpv.delete_flag=1
+        AND vpv.var_process_space_id = #{queryDto.spaceId}
+        <if test="queryDto.sortKey != 'updated_time'">
+            order by ${queryDto.sortKey} ${queryDto.sortType}, updated_time desc, vpv.id desc
+        </if>
+        <if test="queryDto.sortKey == 'updated_time'">
+            order by  updated_time desc, vpv.id desc
+        </if>
+
+    </select>
+
+    <select id="getList" parameterType="com.wiseco.var.process.app.server.service.dto.VariableQueryDto"
+            resultType="com.wiseco.var.process.app.server.repository.entity.VarProcessVariable">
+
+        SELECT
+        id,var_process_space_id, identifier, name, label, category_id,data_type, version, status,
+        created_user, updated_user, created_time, updated_time,dept_code,processing_method
+        FROM var_process_variable
+
+        <where>
+            delete_flag=1
+
+            <if test="queryDto.identifierList != null and queryDto.identifierList.size()>0">
+                and identifier in
+                <foreach collection="queryDto.identifierList" item="identifier" open="(" separator="," close=")">
+                    #{identifier}
+                </foreach>
+            </if>
+
+            <if test="queryDto.idList != null and queryDto.idList.size()>0">
+                and id not in
+                <foreach collection="queryDto.idList" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+
+            <if test="queryDto.spaceId != null and queryDto.spaceId!=''">
+                AND var_process_space_id = #{queryDto.spaceId}
+            </if>
+
+            <if test="queryDto.categoryIdList != null and queryDto.categoryIdList.size()>0">
+                and category_id in
+                <foreach collection="queryDto.categoryIdList" item="categoryId" open="(" separator="," close=")">
+                    #{categoryId}
+                </foreach>
+            </if>
+
+            <!--if test="queryDto.isUse != null and queryDto.isUse != '' and queryDto.isUse == '1'.toString()"-->
+            <if test="queryDto.isUse != null and queryDto.isUse == 1">
+                and id in (SELECT variable_id from var_process_manifest_variable WHERE
+                var_process_space_id=#{queryDto.spaceId})
+            </if>
+
+            <!--if test="queryDto.isUse != null and queryDto.isUse != '' and queryDto.isUse '0'.toString()"-->
+            <if test="queryDto.isUse != null and queryDto.isUse == 0">
+                and id not in (SELECT variable_id from var_process_manifest_variable WHERE
+                var_process_space_id=#{queryDto.spaceId})
+            </if>
+
+            <if test="queryDto.dataTypeList != null and queryDto.dataTypeList.size()>0">
+                and data_type in
+                <foreach collection="queryDto.dataTypeList" item="dataType" open="(" separator="," close=")">
+                    #{dataType}
+                </foreach>
+            </if>
+
+            <if test="queryDto.statusList != null and queryDto.statusList.size()>0">
+                and status in
+                <foreach collection="queryDto.statusList" item="status" open="(" separator="," close=")">
+                    #{status}
+                </foreach>
+            </if>
+
+            <if test="queryDto.keywords != null and queryDto.keywords!=''">
+                AND (name like CONCAT(concat('%',#{queryDto.keywords}),'%') or label like
+                CONCAT(concat('%',#{queryDto.keywords}),'%') )
+            </if>
+
+            <if test="queryDto.tagGroupId != null and queryDto.tagGroupId!=''">
+                and id in (SELECT variable_id from var_process_variable_tag WHERE
+                var_process_space_id=#{queryDto.spaceId} and tag_group_id = #{queryDto.tagGroupId})
+            </if>
+
+            <if test="queryDto.tagName != null and queryDto.tagName!=''">
+                and id in (SELECT variable_id from var_process_variable_tag WHERE
+                var_process_space_id=#{queryDto.spaceId} and tag_name = #{queryDto.tagName})
+            </if>
+
+            <if test="queryDto.deptCode != null and queryDto.deptCode != ''">
+                AND dept_code = #{queryDto.deptCode}
+            </if>
+
+            <if test="queryDto.varTemplateKeyWord != null and queryDto.varTemplateKeyWord!=''">
+                AND id in (select in_vf.variable_id from var_process_variable_function in_vf
+                INNER JOIN var_process_function in_f on in_vf.function_id=in_f.id
+                where in_f.function_type='TEMPLATE' and in_f.delete_flag=1 and in_f.name like CONCAT('%', #{queryDto.varTemplateKeyWord}, '%'))
+            </if>
+        </where>
+
+        order by version desc
+    </select>
+
+    <select id="getManifestDeployContentPage"
+            resultType="com.wiseco.var.process.app.server.service.dto.VariableManifestDeployContentOverviewDto">
+        SELECT vpv.name AS name,
+        vpv.label AS label,
+        vpc.name AS category,
+        vpv.data_type AS dataType,
+        vpv.version AS version,
+        vpv.status AS status
+        FROM var_process_manifest_variable vpiv
+        INNER JOIN var_process_variable vpv ON vpiv.variable_id = vpv.id
+        INNER JOIN var_process_category vpc ON vpv.category_id = vpc.id
+        WHERE vpiv.manifest_id = #{manifestId}
+    </select>
+
+    <select id="getVariableMaximumListedVersion"
+            parameterType="com.wiseco.var.process.app.server.service.dto.VariableMaximumListedVersionQueryDto"
+            resultType="com.wiseco.var.process.app.server.repository.entity.VarProcessVariable">
+        <!--为优化性能, 此处明确查询的指定字段-->
+        SELECT vpv.id,
+        vpv.category_id,
+        vpv.identifier,
+        vpv.version,
+        vpv.name,
+        vpv.label,
+        vpv.data_type,
+        vpv.dept_code
+        FROM var_process_variable vpv
+        INNER JOIN (
+        SELECT identifier,
+        MAX(version) AS version
+        FROM var_process_variable vpv1
+        WHERE var_process_space_id = #{queryDto.spaceId}
+        AND status = 'UP'
+        AND delete_flag = 1
+        <if test="queryDto.excludedIdentifierList != null and queryDto.excludedIdentifierList.size() > 0">
+            AND identifier NOT IN
+            <foreach collection="queryDto.excludedIdentifierList" item="excludedIdentifier" open="(" close=")"
+                     separator=",">
+                #{excludedIdentifier}
+            </foreach>
+        </if>
+        <if test="queryDto.categoryIds != null and queryDto.categoryIds.size() > 0">
+            AND category_id IN
+            <foreach collection="queryDto.categoryIds" item="categoryId" open="(" close=")"
+                     separator=",">
+                #{categoryId}
+            </foreach>
+        </if>
+        <if test="queryDto.deptCode != null and queryDto.deptCode != ''">
+            AND dept_code = #{queryDto.deptCode}
+        </if>
+        <if test="queryDto.varDataType != null and queryDto.varDataType != ''">
+            AND data_type = #{queryDto.varDataType}
+        </if>
+        <if test="queryDto.tagNames != null">
+            AND id IN (select variable_id from var_process_variable_tag where tag_name in
+            <foreach collection="queryDto.tagNames" item="tagName" open="(" close=")" separator=",">
+                #{tagName}
+            </foreach>)
+        </if>
+        <if test="queryDto.keywords != null and queryDto.keywords != ''">
+            AND (name LIKE CONCAT(CONCAT(CONCAT('%', '\\'), #{queryDto.keywords}), '%') OR label LIKE
+            CONCAT(CONCAT(CONCAT('%', '\\'), #{queryDto.keywords}), '%'))
+        </if>
+        <if test="queryDto.deptCodes !=null and queryDto.deptCodes.size() != 0">
+            AND dept_code in
+            <foreach item="item" collection='queryDto.deptCodes' open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        <if test="queryDto.userNames !=null and queryDto.userNames.size() != 0">
+            AND created_user in
+            <foreach item="item" collection='queryDto.userNames' open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        GROUP BY identifier
+        ) max_version ON vpv.identifier = max_version.identifier AND vpv.version = max_version.version
+        WHERE vpv.var_process_space_id = #{queryDto.spaceId}
+        AND vpv.status = 'UP'
+        AND vpv.delete_flag = 1
+        ORDER BY ${queryDto.sortedKey} ${queryDto.sortMethod}
+    </select>
+
+    <select id="getVariableMaximumListedVersion"
+            parameterType="com.wiseco.var.process.app.server.service.dto.VariableMaximumListedVersionQueryDto"
+            resultType="com.wiseco.var.process.app.server.repository.entity.VarProcessVariable"
+            databaseId="sqlServer">
+        <!--为优化性能, 此处明确查询的指定字段-->
+        SELECT vpv.id,
+        vpv.category_id,
+        vpv.identifier,
+        vpv.version,
+        vpv.name,
+        vpv.label,
+        vpv.data_type,
+        vpv.dept_code
+        FROM var_process_variable vpv
+        INNER JOIN (
+        SELECT identifier,
+        MAX(version) AS version
+        FROM var_process_variable vpv1
+        WHERE var_process_space_id = #{queryDto.spaceId}
+        AND status = 'UP'
+        AND delete_flag = 1
+        <if test="queryDto.excludedIdentifierList != null and queryDto.excludedIdentifierList.size() > 0">
+            AND identifier NOT IN
+            <foreach collection="queryDto.excludedIdentifierList" item="excludedIdentifier" open="(" close=")"
+                     separator=",">
+                #{excludedIdentifier}
+            </foreach>
+        </if>
+        <if test="queryDto.categoryIds != null and queryDto.categoryIds.size() > 0">
+            AND category_id IN
+            <foreach collection="queryDto.categoryIds" item="categoryId" open="(" close=")"
+                     separator=",">
+                #{categoryId}
+            </foreach>
+        </if>
+        <if test="queryDto.deptCode != null and queryDto.deptCode != ''">
+            AND dept_code = #{queryDto.deptCode}
+        </if>
+        <if test="queryDto.varDataType != null and queryDto.varDataType != ''">
+            AND data_type = #{queryDto.varDataType}
+        </if>
+        <if test="queryDto.tagNames != null">
+            AND id IN (select variable_id from var_process_variable_tag where tag_name in
+            <foreach collection="queryDto.tagNames" item="tagName" open="(" close=")" separator=",">
+                #{tagName}
+            </foreach>)
+        </if>
+        <if test="queryDto.keywords != null and queryDto.keywords != ''">
+            AND (name LIKE CONCAT('%', #{queryDto.keywords}, '%') OR label LIKE
+            CONCAT('%', #{queryDto.keywords}, '%'))
+        </if>
+        <if test="queryDto.deptCodes !=null and queryDto.deptCodes.size() != 0">
+            AND dept_code in
+            <foreach item="item" collection='queryDto.deptCodes' open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        <if test="queryDto.userNames !=null and queryDto.userNames.size() != 0">
+            AND created_user in
+            <foreach item="item" collection='queryDto.userNames' open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        GROUP BY identifier
+        ) max_version ON vpv.identifier = max_version.identifier AND vpv.version = max_version.version
+        WHERE vpv.var_process_space_id = #{queryDto.spaceId}
+        AND vpv.status = 'UP'
+        AND vpv.delete_flag = 1
+        ORDER BY ${queryDto.sortedKey} ${queryDto.sortMethod}
+    </select>
+
+    <select id="getVariableMaximumListedVersion"
+            parameterType="com.wiseco.var.process.app.server.service.dto.VariableMaximumListedVersionQueryDto"
+            resultType="com.wiseco.var.process.app.server.repository.entity.VarProcessVariable"
+            databaseId="dm">
+        <!--为优化性能, 此处明确查询的指定字段-->
+        SELECT vpv.id,
+        vpv.category_id,
+        vpv.identifier,
+        vpv.version,
+        vpv.name,
+        vpv.label,
+        vpv.data_type,
+        vpv.dept_code
+        FROM var_process_variable vpv
+        INNER JOIN (
+        SELECT identifier,
+        MAX(version) AS version
+        FROM var_process_variable vpv1
+        WHERE var_process_space_id = #{queryDto.spaceId}
+        AND status = 'UP'
+        AND delete_flag = 1
+        <if test="queryDto.excludedIdentifierList != null and queryDto.excludedIdentifierList.size() > 0">
+            AND identifier NOT IN
+            <foreach collection="queryDto.excludedIdentifierList" item="excludedIdentifier" open="(" close=")"
+                     separator=",">
+                #{excludedIdentifier}
+            </foreach>
+        </if>
+        <if test="queryDto.categoryIds != null and queryDto.categoryIds.size() > 0">
+            AND category_id IN
+            <foreach collection="queryDto.categoryIds" item="categoryId" open="(" close=")"
+                     separator=",">
+                #{categoryId}
+            </foreach>
+        </if>
+        <if test="queryDto.deptCode != null and queryDto.deptCode != ''">
+            AND dept_code = #{queryDto.deptCode}
+        </if>
+        <if test="queryDto.varDataType != null and queryDto.varDataType != ''">
+            AND data_type = #{queryDto.varDataType}
+        </if>
+        <if test="queryDto.tagNames != null">
+            AND id IN (select variable_id from var_process_variable_tag where tag_name in
+            <foreach collection="queryDto.tagNames" item="tagName" open="(" close=")" separator=",">
+                #{tagName}
+            </foreach>)
+        </if>
+        <if test="queryDto.keywords != null and queryDto.keywords != ''">
+            AND (name LIKE CONCAT('%', #{queryDto.keywords}, '%') OR label LIKE
+            CONCAT('%', #{queryDto.keywords}, '%'))
+        </if>
+        <if test="queryDto.deptCodes !=null and queryDto.deptCodes.size() != 0">
+            AND dept_code in
+            <foreach item="item" collection='queryDto.deptCodes' open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        <if test="queryDto.userNames !=null and queryDto.userNames.size() != 0">
+            AND created_user in
+            <foreach item="item" collection='queryDto.userNames' open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        GROUP BY identifier
+        ) max_version ON vpv.identifier = max_version.identifier AND vpv.version = max_version.version
+        WHERE vpv.var_process_space_id = #{queryDto.spaceId}
+        AND vpv.status = 'UP'
+        AND vpv.delete_flag = 1
+        ORDER BY ${queryDto.sortedKey} ${queryDto.sortMethod}
+    </select>
+
+    <!--条件+分页查询变量-->
+    <select id="getVariableList" resultType="com.wiseco.var.process.app.server.repository.entity.VarProcessVariable">
+        SELECT vpv.id, vpv.name, vpv.label, vpv.data_type,
+               vpv.category_id, vpv.version, vpv.created_user
+        FROM var_process_variable AS vpv
+        <where>
+            vpv.delete_flag = 1 AND vpv.status = 'UP'
+
+            <if test="variableIds != null and variableIds.size > 0">
+                AND vpv.id IN
+                <foreach collection="variableIds" item="idItem" open="(" separator="," close=")">
+                    #{idItem}
+                </foreach>
+            </if>
+
+            <if test="categoryId != null">
+                AND vpv.category_id = #{categoryId}
+            </if>
+
+            <if test="dataType != null and dataType != ''">
+                AND vpv.data_type = #{dataType}
+            </if>
+
+            <if test="users != null and users.size > 0">
+                AND vpv.created_user IN
+                <foreach collection="users" item="user" open="(" separator="," close=")">
+                    #{user}
+                </foreach>
+            </if>
+
+            <if test="keyword != null and keyword != ''">
+                AND (vpv.label LIKE CONCAT(CONCAT('%', #{keyword}), '%')
+                OR vpv.name LIKE CONCAT(CONCAT('%', #{keyword}), '%'))
+            </if>
+        </where>
+
+        <if test="order == null or order == ''">
+            ORDER BY vpv.label ASC
+        </if>
+
+        <if test="order == 'label_asc'">
+            ORDER BY vpv.label ASC
+        </if>
+
+        <if test="order == 'label_desc'">
+            ORDER BY vpv.label DESC
+        </if>
+
+        <if test="order == 'code_asc'">
+            ORDER BY vpv.name ASC
+        </if>
+
+        <if test="order == 'code_desc'">
+            ORDER BY vpv.name DESC
+        </if>
+    </select>
+
+    <!--获取所有启用的实时服务下, 所关联的启用变量清单, 然后根据这些变量清单，获取所有启用的变量Id-->
+    <select id="variableIdsByOther" resultType="long">
+        SELECT DISTINCT vpmv.variable_id
+        FROM var_process_manifest_variable AS vpmv
+        INNER JOIN var_process_variable AS vpv ON vpv.id = vpmv.variable_id AND vpv.delete_flag = 1 AND vpv.status = 'UP'
+        WHERE vpmv.manifest_id IN (
+            SELECT DISTINCT vpsm.manifest_id
+            FROM var_process_service_manifest AS vpsm
+            INNER JOIN var_process_manifest AS vpm ON vpm.id = vpsm.manifest_id AND vpm.delete_flag = 1 AND vpm.state = 'UP'
+            WHERE vpsm.service_id IN (
+                SELECT vpsv.id FROM var_process_service_version vpsv
+                WHERE 	vpsv.delete_flag = 1 AND vpsv.state = 'ENABLED'
+            )
+        );
+    </select>
+
+</mapper>

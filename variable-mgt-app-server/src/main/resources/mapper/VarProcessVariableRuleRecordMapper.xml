@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiseco.var.process.app.server.repository.VarProcessVariableRuleRecordMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap"
+               type="com.wiseco.var.process.app.server.repository.entity.VarProcessVariableRuleRecord">
+        <result column="id" property="id"/>
+        <result column="function_id" property="functionId"/>
+        <result column="variable_rule_id" property="variableRuleId"/>
+        <result column="name" property="name"/>
+        <result column="identifier" property="identifier"/>
+        <result column="variable_type" property="variableType"/>
+        <result column="data_type" property="dataType"/>
+        <result column="created_user" property="createdUser"/>
+        <result column="updated_user" property="updatedUser"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        function_id, variable_rule_id, plan_name, name, identifier,variable_type, data_type, param_json, created_user,
+        updated_user, created_time, updated_time
+    </sql>
+
+
+    <select id="findPageList" resultType="com.wiseco.var.process.app.server.controller.vo.VariableProduceRecordVo">
+        select
+        <include refid="Base_Column_List"/>
+        from var_process_variable_rule_record
+        <where>
+            variable_rule_id =#{id}
+            and del_flag =0
+            <if test="planName!=null and planName != ''">
+                and plan_name =#{planName}
+            </if>
+        </where>
+    </select>
+
+    <select id="getListMaps" resultType="java.util.Map">
+        select r.name,r.identifier,c.name variable_type, r.data_type
+        from var_process_variable_rule_record r
+        LEFT JOIN var_process_category c on r.variable_type =c.id
+        <where>
+            r.del_flag =0
+            <if test="functionId!=null">
+                and r.function_id =#{functionId}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectByName" resultType="com.wiseco.var.process.app.server.controller.vo.VariableProduceRecordVo">
+        select
+        <include refid="Base_Column_List"/>
+        from var_process_variable_rule_record
+        <where>
+            del_flag =0
+            and function_id=#{functionId}
+            and (name=#{name} or
+            identifier=#{identifier})
+            limit 1
+        </where>
+    </select>
+
+
+</mapper>

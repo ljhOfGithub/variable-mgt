@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiseco.var.process.app.server.repository.VarProcessTestRulesMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wiseco.var.process.app.server.repository.entity.VarProcessTestRules">
+        <result column="id" property="id"/>
+        <result column="var_process_space_id" property="varProcessSpaceId"/>
+        <result column="var_path" property="varPath"/>
+        <result column="var_type" property="varType"/>
+        <result column="generate_mode" property="generateMode"/>
+        <result column="generate_rule" property="generateRule"/>
+        <result column="generate_rule_desc" property="generateRuleDesc"/>
+        <result column="generate_rule_formula" property="generateRuleFormula"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        var_process_space_id, var_path, var_type, generate_mode, generate_rule, generate_rule_desc,
+        generate_rule_formula, created_time, updated_time
+    </sql>
+
+</mapper>

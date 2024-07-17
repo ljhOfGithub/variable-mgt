@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiseco.var.process.app.server.repository.VarProcessDataModelMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wiseco.var.process.app.server.repository.entity.VarProcessDataModel">
+        <result column="id" property="id"/>
+        <result column="var_process_space_id" property="varProcessSpaceId"/>
+        <result column="object_name" property="objectName"/>
+        <result column="object_label" property="objectLabel"/>
+        <result column="content" property="content"/>
+        <result column="source_property_num" property="sourcePropertyNum"/>
+        <result column="extend_property_num" property="extendPropertyNum"/>
+        <result column="version" property="version"/>
+        <result column="created_user" property="createdUser"/>
+        <result column="updated_user" property="updatedUser"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        var_process_space_id, object_name, object_label, content, source_property_num, extend_property_num, version,
+        created_user, updated_user, created_time, updated_time
+    </sql>
+
+    <select id="findPageList" resultType="com.wiseco.var.process.app.server.repository.entity.VarProcessDataModel">
+        SELECT vpdm.id,
+        vpdm.var_process_space_id,
+        vpdm.object_name ,
+        vpdm.object_label,
+        vpdm.object_source_type,
+        vpdm.object_source_info,
+        vpdm.source_property_num,
+        vpdm.extend_property_num,
+        vpdm.version,
+        vpdm.created_dept,
+        vpdm.created_dept_name ,
+        vpdm.created_user,
+        vpdm.updated_user,
+        vpdm.created_time,
+        vpdm.updated_time,
+        IFNULL(model_usage.is_used, false) AS used
+        FROM var_process_data_model vpdm
+        INNER join (
+        SELECT object_name,max(version) as version from var_process_data_model
+        GROUP BY object_name
+        ) AS dmx ON vpdm.object_name=dmx.object_name AND vpdm.version=dmx.version
+        LEFT JOIN (SELECT vpmdm.object_name as object_name, IF(COUNT(vpmdm.object_name) > 0, true, false) as is_used
+        FROM var_process_manifest_data_model vpmdm
+        INNER JOIN (
+        SELECT object_name,max(version) as version from var_process_data_model
+        GROUP BY object_name
+        ) AS dmx1 on dmx1.object_name = vpmdm.object_name  and dmx1.version = vpmdm.object_version
+        GROUP BY vpmdm.object_name
+        union
+        SELECT distinct vpf.prep_object_name as object_name, IF(COUNT(vpf.prep_object_name) > 0, true, false) as is_used
+        FROM var_process_function vpf
+        INNER JOIN var_process_data_model vpdm2 on vpdm2.object_name = vpf.prep_object_name
+        where vpf.function_type = 'PREP' and vpf.status != 'DELETE'
+        GROUP BY vpf.prep_object_name
+        ) AS model_usage
+        ON vpdm.object_name = model_usage.object_name
+        <where>
+            vpdm.var_process_space_id = #{queryDto.spaceId}
+            <if test="queryDto.name != null and queryDto.name != ''">
+                AND (vpdm.object_name like CONCAT(concat('%',#{queryDto.name}),'%') or vpdm.object_label like
+                CONCAT(concat('%',#{queryDto.name}),'%') )
+            </if>
+            <if test="queryDto.sourceType != null">
+                AND object_source_type = #{queryDto.sourceType}
+            </if>
+            <if test="queryDto.createdDept != null and queryDto.createdDept != ''">
+                AND created_dept = #{queryDto.createdDept}
+            </if>
+            <if test="queryDto.used != null">
+                AND IFNULL(model_usage.is_used, false) = #{queryDto.used}
+            </if>
+            <if test="queryDto.deptCodes !=null and queryDto.deptCodes.size() != 0">
+                AND created_dept in
+                <foreach item="item" collection='queryDto.deptCodes' open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+            <if test="queryDto.userNames !=null and queryDto.userNames.size() != 0">
+                AND created_user in
+                <foreach item="item" collection='queryDto.userNames' open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+        </where>
+        order by
+        <if test="queryDto.sortKey != null and queryDto.sortKey != ''">
+            ${queryDto.sortKey} ${queryDto.sortType},
+        </if>
+        LOWER(vpdm.object_name) asc
+    </select>
+
+    <select id="findPageList" resultType="com.wiseco.var.process.app.server.repository.entity.VarProcessDataModel" databaseId="sqlServer">
+        SELECT vpdm.id,
+        vpdm.var_process_space_id,
+        vpdm.object_name ,
+        vpdm.object_label,
+        vpdm.object_source_type,
+        vpdm.object_source_info,
+        vpdm.source_property_num,
+        vpdm.extend_property_num,
+        vpdm.version,
+        vpdm.created_dept,
+        vpdm.created_dept_name ,
+        vpdm.created_user,
+        vpdm.updated_user,
+        vpdm.created_time,
+        vpdm.updated_time,
+        ISNULL(model_usage.is_used, 'false') AS used
+        FROM var_process_data_model vpdm
+        INNER join (
+        SELECT object_name,max(version) as version from var_process_data_model
+        GROUP BY object_name
+        ) AS dmx ON vpdm.object_name=dmx.object_name AND vpdm.version=dmx.version
+        LEFT JOIN (SELECT vpmdm.object_name as object_name, IIF(COUNT(vpmdm.object_name) > 0, 'true', 'false') as is_used
+        FROM var_process_manifest_data_model vpmdm
+        INNER JOIN (
+        SELECT object_name,max(version) as version from var_process_data_model
+        GROUP BY object_name
+        ) AS dmx1 on dmx1.object_name = vpmdm.object_name  and dmx1.version = vpmdm.object_version
+        GROUP BY vpmdm.object_name
+        union
+        SELECT distinct vpf.prep_object_name as object_name, IIF(COUNT(vpf.prep_object_name) > 0, 'true', 'false') as is_used
+        FROM var_process_function vpf
+        INNER JOIN var_process_data_model vpdm2 on vpdm2.object_name = vpf.prep_object_name
+        where vpf.function_type = 'PREP' and vpf.status != 'DELETE'
+        GROUP BY vpf.prep_object_name
+        ) AS model_usage
+        ON vpdm.object_name = model_usage.object_name
+        <where>
+            vpdm.var_process_space_id = #{queryDto.spaceId}
+            <if test="queryDto.name != null and queryDto.name != ''">
+                AND (vpdm.object_name like CONCAT(concat('%',#{queryDto.name}),'%') or vpdm.object_label like
+                CONCAT(concat('%',#{queryDto.name}),'%') )
+            </if>
+            <if test="queryDto.sourceType != null">
+                AND object_source_type = #{queryDto.sourceType}
+            </if>
+            <if test="queryDto.createdDept != null and queryDto.createdDept != ''">
+                AND created_dept = #{queryDto.createdDept}
+            </if>
+            <if test="queryDto.used != null">
+                AND ISNULL(model_usage.is_used, 'false') = #{queryDto.used}
+            </if>
+            <if test="queryDto.deptCodes !=null and queryDto.deptCodes.size() != 0">
+                AND created_dept in
+                <foreach item="item" collection='queryDto.deptCodes' open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+            <if test="queryDto.userNames !=null and queryDto.userNames.size() != 0">
+                AND created_user in
+                <foreach item="item" collection='queryDto.userNames' open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+        </where>
+        order by
+        <if test="queryDto.sortKey != null and queryDto.sortKey != ''">
+            ${queryDto.sortKey} ${queryDto.sortType},
+        </if>
+        LOWER(vpdm.object_name) asc
+    </select>
+
+    <select id="findMaxVersionList"
+            resultType="com.wiseco.var.process.app.server.repository.entity.VarProcessDataModel">
+        select vpdm.id,
+        vpdm.object_name,
+        vpdm.object_label,
+        vpdm.var_process_space_id,
+        vpdm.source_property_num,
+        vpdm.extend_property_num,
+        vpdm.version,
+        vpdm.created_user,
+        vpdm.updated_user,
+        vpdm.created_time,
+        vpdm.updated_time,
+        vpdm.content
+        from var_process_data_model vpdm
+        inner join (
+        select object_name, max(version) as version
+        from var_process_data_model
+        where var_process_space_id = #{spaceId}
+        <if test="deptCodes !=null and deptCodes.size() != 0">
+            AND created_dept in
+            <foreach item="item" collection='deptCodes' open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        <if test="userNames !=null and userNames.size() != 0">
+            AND created_user in
+            <foreach item="item" collection='userNames' open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        GROUP BY object_name
+        ) dmx on vpdm.object_name = dmx.object_name and vpdm.version = dmx.version
+        where vpdm.var_process_space_id = #{spaceId}
+    </select>
+
+
+    <select id="getDataModelMaxVersionList"
+            resultType="com.wiseco.var.process.app.server.repository.entity.VarProcessDataModel">
+        select vpdm.id,
+        vpdm.object_name,
+        vpdm.object_label,
+        vpdm.var_process_space_id,
+        vpdm.source_property_num,
+        vpdm.extend_property_num,
+        vpdm.version,
+        vpdm.created_user,
+        vpdm.updated_user,
+        vpdm.created_time,
+        vpdm.updated_time,
+        vpdm.object_source_type,
+        vpdm.content
+        from var_process_data_model vpdm
+        inner join (
+        select object_name, max(version) as version
+        from var_process_data_model
+        where var_process_space_id = 1
+        GROUP BY object_name
+        ) dmx on vpdm.object_name = dmx.object_name and vpdm.version = dmx.version
+        where vpdm.var_process_space_id = 1
+        and vpdm.object_source_type = #{sourceType}
+        order by lower(vpdm.object_name)
+    </select>
+
+    <select id="listDataModelSpecificVersion"
+            resultType="com.wiseco.var.process.app.server.repository.entity.VarProcessDataModel">
+        SELECT vpdm.*
+        FROM var_process_data_model vpdm
+        INNER JOIN var_process_manifest_data_model vpim ON vpdm.object_name = vpim.object_name
+        AND vpdm.version = vpim.object_version
+        AND vpdm.var_process_space_id = vpim.var_process_space_id
+        <where>
+
+            <if test="manifestId != null and manifestId!=''">
+                AND vpim.manifest_id = #{manifestId}
+            </if>
+            <if test="sourceType != null and sourceType!=''">
+                AND vpim.source_type = #{sourceType}
+            </if>
+        </where>
+    </select>
+
+    <select id="findMaxVersionListByNames"
+            resultType="com.wiseco.var.process.app.server.repository.entity.VarProcessDataModel">
+        SELECT
+        vpdm.id,
+        vpdm.object_name,
+        vpdm.version,
+        vpdm.object_label,
+        vpdm.object_source_type,
+        vpdm.object_source_info,
+        vpdm.source_property_num,
+        vpdm.extend_property_num
+        FROM var_process_data_model vpdm
+        JOIN
+        (SELECT
+        MAX(version) AS version,
+        object_name
+        FROM
+        var_process_data_model
+        WHERE
+        (object_name IN
+        <foreach collection="nameList" item="name" open="(" separator="," close=")">#{name}</foreach>
+        and var_process_space_id = #{spaceId})
+        GROUP BY
+        object_name ) AS vpdm1
+
+        ON vpdm.object_name = vpdm1.object_name
+        AND vpdm.version = vpdm1.version
+
+    </select>
+    <select id="findByDataModelInfo"
+            resultType="com.wiseco.var.process.app.server.repository.entity.VarProcessDataModel">
+        SELECT vpdm.id
+        FROM var_process_data_model AS vpdm
+        WHERE object_name = #{objectName}
+        AND version = #{version}
+        ORDER BY id desc
+        LIMIT 1
+    </select>
+
+    <select id="findByDataModelInfo"
+            resultType="com.wiseco.var.process.app.server.repository.entity.VarProcessDataModel" databaseId="sqlServer">
+        SELECT vpdm.id
+        FROM var_process_data_model AS vpdm
+        WHERE object_name = #{objectName}
+        AND version = #{version}
+        ORDER BY id desc
+        offset 0 rows fetch next 1 rows only
+    </select>
+
+    <select id="findByDataModelName"
+            resultType="com.wiseco.var.process.app.server.repository.entity.VarProcessDataModel">
+        SELECT *
+        FROM var_process_data_model
+        WHERE object_name = #{objectName}
+        ORDER BY version desc
+            LIMIT 1
+    </select>
+
+    <select id="findByDataModelName"
+            resultType="com.wiseco.var.process.app.server.repository.entity.VarProcessDataModel" databaseId="sqlServer">
+        SELECT *
+        FROM var_process_data_model
+        WHERE object_name = #{objectName}
+        ORDER BY version desc
+        offset 0 rows fetch next 1 rows only
+    </select>
+
+    <select id="findParams"
+            resultType="com.wiseco.var.process.app.server.controller.vo.output.OutSideParamsOutputVo">
+        SELECT id, object_name, object_label, MAX(version) AS version,object_source_type AS sourceType,object_source_info AS source,
+        source_property_num as sourcepPropertyNum, extend_property_num extendPropertyNum, created_dept_name
+        createdDeptName
+        FROM var_process_data_model
+        <where>
+            var_process_space_id = #{queryDto.spaceId}
+            <if test="queryDto.sourceType != null"> and object_source_type = #{queryDto.sourceType}</if>
+            <if test="queryDto.deptCode != null"> and created_dept = #{queryDto.deptCode}</if>
+            <if test="queryDto.excludedParams != null and queryDto.excludedParams.size()>0">
+                AND object_name NOT IN
+                <foreach collection="queryDto.excludedParams" item="name" open="(" separator="," close=")">
+                    #{name}
+                </foreach>
+            </if>
+            <if test="queryDto.keyWords != null and queryDto.keyWords !='' ">
+                and (object_name like CONCAT(CONCAT('%', #{queryDto.keyWords}), '%')
+                or object_label like CONCAT(CONCAT('%', #{queryDto.keyWords}), '%'))
+            </if>
+            <if test="queryDto.deptCodes !=null and queryDto.deptCodes.size() != 0">
+                AND created_dept in
+                <foreach item="item" collection='queryDto.deptCodes' open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+            <if test="queryDto.userNames !=null and queryDto.userNames.size() != 0">
+                AND created_user in
+                <foreach item="item" collection='queryDto.userNames' open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        GROUP BY object_name
+        order by object_name
+    </select>
+
+
+    <select id="findParams"
+            resultType="com.wiseco.var.process.app.server.controller.vo.output.OutSideParamsOutputVo" databaseId="sqlServer">
+        SELECT id, vpdm.object_name, object_label, vpdm.version AS version,object_source_type AS
+        sourceType,object_source_info AS source,
+        source_property_num as sourcepPropertyNum, extend_property_num extendPropertyNum, created_dept_name
+        createdDeptName
+        FROM var_process_data_model vpdm
+        join (
+        select object_name , max(version) as version from var_process_data_model
+        <where>
+            var_process_space_id = #{queryDto.spaceId}
+            <if test="queryDto.sourceType != null">and object_source_type =
+                #{queryDto.sourceType}
+            </if>
+            <if test="queryDto.deptCode != null">and created_dept = #{queryDto.deptCode}</if>
+            <if test="queryDto.excludedParams != null and queryDto.excludedParams.size()>0">
+                AND object_name NOT IN
+                <foreach collection="queryDto.excludedParams" item="name" open="(" separator="," close=")">
+                    #{name}
+                </foreach>
+            </if>
+            <if test="queryDto.keyWords != null and queryDto.keyWords !='' ">
+                and (object_name like CONCAT(CONCAT('%', #{queryDto.keyWords}), '%')
+                or object_label like CONCAT(CONCAT('%', #{queryDto.keyWords}), '%'))
+            </if>
+            <if test="queryDto.deptCodes !=null and queryDto.deptCodes.size() != 0">
+                AND created_dept in
+                <foreach item="item" collection='queryDto.deptCodes' open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+            <if test="queryDto.userNames !=null and queryDto.userNames.size() != 0">
+                AND created_user in
+                <foreach item="item" collection='queryDto.userNames' open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        group by object_name
+        ) vpdm1 on vpdm.object_name = vpdm1.object_name and vpdm.version = vpdm1.version
+        order by object_name
+    </select>
+
+    <select id="findParamsCount"
+            resultType="java.lang.Integer">
+        select count(*) from (
+        SELECT id, vpdm.object_name, object_label, vpdm.version AS version,object_source_type AS
+        sourceType,object_source_info AS source,
+        source_property_num as sourcepPropertyNum, extend_property_num extendPropertyNum, created_dept_name
+        createdDeptName
+        FROM var_process_data_model vpdm
+        join (
+        select object_name , max(version) as version from var_process_data_model
+        <where>
+            var_process_space_id = #{queryDto.spaceId}
+            <if test="queryDto.sourceType != null">and object_source_type =
+                #{queryDto.sourceType}
+            </if>
+            <if test="queryDto.deptCode != null">and created_dept = #{queryDto.deptCode}</if>
+            <if test="queryDto.excludedParams != null and queryDto.excludedParams.size()>0">
+                AND object_name NOT IN
+                <foreach collection="queryDto.excludedParams" item="name" open="(" separator="," close=")">
+                    #{name}
+                </foreach>
+            </if>
+            <if test="queryDto.keyWords != null and queryDto.keyWords !='' ">
+                and (object_name like CONCAT(CONCAT('%', #{queryDto.keyWords}), '%')
+                or object_label like CONCAT(CONCAT('%', #{queryDto.keyWords}), '%'))
+            </if>
+            <if test="queryDto.deptCodes !=null and queryDto.deptCodes.size() != 0">
+                AND created_dept in
+                <foreach item="item" collection='queryDto.deptCodes' open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+            <if test="queryDto.userNames !=null and queryDto.userNames.size() != 0">
+                AND created_user in
+                <foreach item="item" collection='queryDto.userNames' open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        group by object_name
+        ) vpdm1 on vpdm.object_name = vpdm1.object_name and vpdm.version = vpdm1.version
+        ) TOTAL
+    </select>
+
+</mapper>

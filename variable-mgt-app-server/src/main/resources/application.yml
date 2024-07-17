@@ -1,0 +1,24 @@
+server:
+  port: 9536
+
+# 应用监控配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+  health:
+    redis:
+      enabled: false
+    mongo:
+      enabled: false
+  endpoint:
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+

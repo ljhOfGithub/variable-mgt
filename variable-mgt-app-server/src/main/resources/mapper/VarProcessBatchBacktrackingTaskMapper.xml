@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiseco.var.process.app.server.repository.VarProcessBatchBacktrackingTaskMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap"
+               type="com.wiseco.var.process.app.server.repository.entity.VarProcessBatchBacktrackingTask">
+        <result column="id" property="id"/>
+        <result column="backtracking_id" property="backtrackingId"/>
+        <result column="status" property="status"/>
+        <result column="code" property="code"/>
+        <result column="start_time" property="startTime"/>
+        <result column="end_Time" property="endTime"/>
+        <result column="completion" property="completion"/>
+        <result column="success" property="success"/>
+        <result column="maximum_response_time" property="maximumResponseTime"/>
+        <result column="minimum_response_time" property="minimumResponseTime"/>
+        <result column="average_response_time" property="averageResponseTime"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+        <result column="created_user" property="createdUser"/>
+        <result column="error_message" property="errorMessage"/>
+    </resultMap>
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        backtracking_id, status, code, start_time, end_Time, completion, success, maximum_response_time,
+        minimum_response_time, average_response_time, created_time, updated_time, created_user, error_message
+    </sql>
+
+    <select id="getByCode"
+            parameterType="java.lang.String"
+            resultType="com.wiseco.var.process.app.server.repository.entity.VarProcessBatchBacktrackingTask">
+        SELECT
+        vpbt.*
+        FROM var_process_batch_backtracking_task vpbt
+        WHERE vpbt.code = #{batchNumber}
+        ORDER BY vpbt.start_time DESC
+        LIMIT 1
+    </select>
+
+    <select id="getByCode"
+            parameterType="java.lang.String"
+            resultType="com.wiseco.var.process.app.server.repository.entity.VarProcessBatchBacktrackingTask"
+            databaseId="sqlServer">
+        SELECT top 1
+            vpbt.*
+        FROM var_process_batch_backtracking_task vpbt
+        WHERE vpbt.code = #{batchNumber}
+        ORDER BY vpbt.start_time DESC
+    </select>
+
+    <select id="getErrorMessage"
+            parameterType="java.lang.Long"
+            resultType="java.lang.String">
+        SELECT vpbt.error_message
+        FROM var_process_batch_backtracking_task vpbt
+        where vpbt.backtracking_id = #{backtrackingId}
+        AND vpbt.status = 'FAIL'
+        ORDER BY vpbt.start_time DESC
+        LIMIT 1
+    </select>
+
+    <select id="getErrorMessage"
+            parameterType="java.lang.Long"
+            resultType="java.lang.String"
+            databaseId="sqlServer">
+        SELECT top 1 vpbt.error_message
+        FROM var_process_batch_backtracking_task vpbt
+        where vpbt.backtracking_id = #{backtrackingId}
+        AND vpbt.status = 'FAIL'
+        ORDER BY vpbt.start_time DESC
+    </select>
+
+    <select id="findBacktrackingTaskList"
+            parameterType="com.wiseco.var.process.app.server.service.dto.BacktrackingTaskQueryDto"
+            resultType="com.wiseco.var.process.app.server.service.dto.BacktrackingTaskDetailDto">
+        SELECT
+        vpbt.id,
+        vpbt.backtracking_id,
+        vpbt.status,
+        vpbt.code,
+        vpbt.start_time,
+        vpbt.end_time,
+        vpbt.completion,
+        vpbt.success,
+        vpbt.maximum_response_time,
+        vpbt.minimum_response_time,
+        vpbt.average_response_time,
+        vpbt.created_time,
+        vpbt.updated_time,
+        vpbt.created_user,
+        vpbt.error_message,
+        vpbt.result_file_info,
+        unix_timestamp(vpbt.end_time) - unix_timestamp(vpbt.start_time) AS duration
+        FROM var_process_batch_backtracking_task vpbt
+        <where>
+            vpbt.backtracking_id = #{queryDto.backtrackingId}
+        </where>
+        ORDER BY vpbt.start_time DESC
+    </select>
+
+    <select id="findBacktrackingTaskList"
+            parameterType="com.wiseco.var.process.app.server.service.dto.BacktrackingTaskQueryDto"
+            resultType="com.wiseco.var.process.app.server.service.dto.BacktrackingTaskDetailDto"
+            databaseId="sqlServer">
+        SELECT
+        vpbt.id,
+        vpbt.backtracking_id,
+        vpbt.status,
+        vpbt.code,
+        vpbt.start_time,
+        vpbt.end_time,
+        vpbt.completion,
+        vpbt.success,
+        vpbt.maximum_response_time,
+        vpbt.minimum_response_time,
+        vpbt.average_response_time,
+        vpbt.created_time,
+        vpbt.updated_time,
+        vpbt.created_user,
+        vpbt.error_message,
+        vpbt.result_file_info,
+        DATEDIFF(second,vpbt.start_time,vpbt.end_time)  AS duration
+        FROM var_process_batch_backtracking_task vpbt
+        <where>
+            vpbt.backtracking_id = #{queryDto.backtrackingId}
+        </where>
+        ORDER BY vpbt.start_time DESC
+    </select>
+
+
+    <select id="getBacktrackingSingleTask" parameterType="long"
+            resultType="com.wiseco.var.process.app.server.service.dto.BacktrackingTaskDto">
+        SELECT vpbbt.status, vpbbt.id, vpbbt.start_time
+        FROM var_process_batch_backtracking_task vpbbt
+        WHERE backtracking_id = #{backtrackingId}
+        ORDER BY start_time DESC
+        LIMIT 1 OFFSET 0
+    </select>
+
+    <select id="getBacktrackingSingleTask" parameterType="long"
+            resultType="com.wiseco.var.process.app.server.service.dto.BacktrackingTaskDto"
+            databaseId="sqlServer">
+        SELECT vpbbt.status, vpbbt.id, vpbbt.start_time
+        FROM var_process_batch_backtracking_task vpbbt
+        WHERE backtracking_id = #{backtrackingId}
+        ORDER BY start_time DESC
+        OFFSET 0 rows fetch next 1 rows only
+    </select>
+
+
+    <update id="updateStateByIds">
+        update var_process_batch_backtracking_task
+        set status = #{backtrackingTaskStatusEnum}
+        where id in
+        <foreach collection="idList" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+</mapper>

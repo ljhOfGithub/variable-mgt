@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiseco.var.process.app.server.repository.VarProcessFunctionVarMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wiseco.var.process.app.server.repository.entity.VarProcessFunctionVar">
+        <result column="id" property="id"/>
+        <result column="function_id" property="functionId"/>
+        <result column="var_path" property="varPath"/>
+        <result column="var_name" property="varName"/>
+        <result column="var_type" property="varType"/>
+        <result column="is_self" property="isSelf"/>
+        <result column="is_array" property="isArray"/>
+        <result column="parameter_label" property="parameterLabel"/>
+        <result column="parameter_type" property="parameterType"/>
+        <result column="is_parameter_array" property="isParameterArray"/>
+        <result column="test_flag" property="testFlag"/>
+        <result column="action_history" property="actionHistory"/>
+        <result column="created_user" property="createdUser"/>
+        <result column="updated_user" property="updatedUser"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        function_id, var_process_path, var_process_name, var_process_type, is_self, is_array, parameter_label,
+        parameter_type, is_parameter_array, test_flag, action_history, created_user, updated_user, created_time,
+        updated_time
+    </sql>
+
+    <select id="getPreProcessLogicProcessedExtendedProperties"
+            resultType="com.wiseco.var.process.app.server.service.dto.VariableFunctionUsageDto">
+        SELECT vpf.id AS functionId,
+        vpf.identifier AS functionIdentifier,
+        vpf.name AS functionName,
+        vpf.function_type AS functionType,
+        vpf.status AS functionStatus,
+        vpfv.var_path AS varPath,
+        vpfv.var_name AS varName,
+        vpfv.var_type AS varType,
+        vpfv.is_array AS isArray,
+        vpfv.action_history AS actionHistory
+        FROM var_process_function vpf
+        INNER JOIN var_process_function_var vpfv
+        ON vpf.id = vpfv.function_id
+        AND vpf.function_type = 3 -- 仅搜索预处理逻辑
+        AND vpf.delete_flag = 1 -- 未删除的公共方法
+        WHERE vpf.var_process_space_id = #{spaceId}
+    </select>
+
+</mapper>

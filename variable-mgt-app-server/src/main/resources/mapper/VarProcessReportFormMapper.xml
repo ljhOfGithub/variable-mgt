@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.wiseco.var.process.app.server.repository.VarProcessReportFormMapper">
+
+    <!--获取服务报表的list-->
+    <select id="getServiceReportFormList" resultType="com.wiseco.var.process.app.server.controller.vo.ReportFormItemVo">
+        SELECT vprf.id, vprf.report_form_name AS name FROM var_process_report_form AS vprf
+        <where>
+            vprf.delete_flag = 1 AND vprf.state = 'UP' AND vprf.report_form_category = 'SERVICE'
+            <if test="deptCodes != null and deptCodes.size > 0">
+                AND vprf.dept_code IN
+                <foreach collection="deptCodes" item="dept" open="(" separator="," close=")">
+                    #{dept}
+                </foreach>
+            </if>
+
+            <if test="userNames != null and userNames.size > 0">
+                AND vprf.created_user IN
+                <foreach collection="userNames" item="name" open="(" separator="," close=")">
+                    #{name}
+                </foreach>
+            </if>
+        </where>
+
+        ORDER BY ISNULL(vprf.report_form_order) ASC, vprf.report_form_order ASC, vprf.updated_time DESC;
+    </select>
+
+    <select id="getServiceReportFormList" resultType="com.wiseco.var.process.app.server.controller.vo.ReportFormItemVo" databaseId="sqlServer">
+        SELECT vprf.id, vprf.report_form_name AS name FROM var_process_report_form AS vprf
+        <where>
+            vprf.delete_flag = 1 AND vprf.state = 'UP' AND vprf.report_form_category = 'SERVICE'
+            <if test="deptCodes != null and deptCodes.size > 0">
+                AND vprf.dept_code IN
+                <foreach collection="deptCodes" item="dept" open="(" separator="," close=")">
+                    #{dept}
+                </foreach>
+            </if>
+
+            <if test="userNames != null and userNames.size > 0">
+                AND vprf.created_user IN
+                <foreach collection="userNames" item="name" open="(" separator="," close=")">
+                    #{name}
+                </foreach>
+            </if>
+        </where>
+
+        ORDER BY ISNULL(vprf.report_form_order,0) ASC, vprf.report_form_order ASC, vprf.updated_time DESC;
+    </select>
+
+    <!--获取单指标分析报表的list-->
+    <select id="getVariableReportFormList" resultType="com.wiseco.var.process.app.server.controller.vo.ReportFormItemVo">
+        SELECT vprf.id, vprf.report_form_name AS name FROM var_process_report_form AS vprf
+        <where>
+            vprf.delete_flag = 1 AND vprf.state = 'UP' AND vprf.report_form_category = 'SINGLE_VARIABLE_ANALYZE'
+            <if test="deptCodes != null and deptCodes.size > 0">
+                AND vprf.dept_code IN
+                <foreach collection="deptCodes" item="dept" open="(" separator="," close=")">
+                    #{dept}
+                </foreach>
+            </if>
+
+            <if test="userNames != null and userNames.size > 0">
+                AND vprf.created_user IN
+                <foreach collection="userNames" item="name" open="(" separator="," close=")">
+                    #{name}
+                </foreach>
+            </if>
+        </where>
+
+        ORDER BY ISNULL(vprf.report_form_order) ASC, vprf.report_form_order ASC, vprf.updated_time DESC;
+    </select>
+
+    <select id="getVariableReportFormList" resultType="com.wiseco.var.process.app.server.controller.vo.ReportFormItemVo" databaseId="sqlServer">
+        SELECT vprf.id, vprf.report_form_name AS name FROM var_process_report_form AS vprf
+        <where>
+            vprf.delete_flag = 1 AND vprf.state = 'UP' AND vprf.report_form_category = 'SINGLE_VARIABLE_ANALYZE'
+            <if test="deptCodes != null and deptCodes.size > 0">
+                AND vprf.dept_code IN
+                <foreach collection="deptCodes" item="dept" open="(" separator="," close=")">
+                    #{dept}
+                </foreach>
+            </if>
+
+            <if test="userNames != null and userNames.size > 0">
+                AND vprf.created_user IN
+                <foreach collection="userNames" item="name" open="(" separator="," close=")">
+                    #{name}
+                </foreach>
+            </if>
+        </where>
+
+        ORDER BY ISNULL(vprf.report_form_order,0) ASC, vprf.report_form_order ASC, vprf.updated_time DESC;
+    </select>
+
+    <!--获取指标对比分析报表的list-->
+    <select id="getVariableCompareReportFromList" resultType="com.wiseco.var.process.app.server.controller.vo.ReportFormItemVo">
+        SELECT vprf.id, vprf.report_form_name AS name FROM var_process_report_form AS vprf
+        <where>
+            vprf.delete_flag = 1 AND vprf.state = 'UP' AND vprf.report_form_category = 'VARIABLE_COMPARE_ANALYZE'
+            <if test="deptCodes != null and deptCodes.size > 0">
+                AND vprf.dept_code IN
+                <foreach collection="deptCodes" item="dept" open="(" separator="," close=")">
+                    #{dept}
+                </foreach>
+            </if>
+
+            <if test="userNames != null and userNames.size > 0">
+                AND vprf.created_user IN
+                <foreach collection="userNames" item="name" open="(" separator="," close=")">
+                    #{name}
+                </foreach>
+            </if>
+        </where>
+
+        ORDER BY ISNULL(vprf.report_form_order) ASC, vprf.report_form_order ASC, vprf.updated_time DESC;
+    </select>
+
+    <select id="getVariableCompareReportFromList" resultType="com.wiseco.var.process.app.server.controller.vo.ReportFormItemVo" databaseId="sqlServer">
+        SELECT vprf.id, vprf.report_form_name AS name FROM var_process_report_form AS vprf
+        <where>
+            vprf.delete_flag = 1 AND vprf.state = 'UP' AND vprf.report_form_category = 'VARIABLE_COMPARE_ANALYZE'
+            <if test="deptCodes != null and deptCodes.size > 0">
+                AND vprf.dept_code IN
+                <foreach collection="deptCodes" item="dept" open="(" separator="," close=")">
+                    #{dept}
+                </foreach>
+            </if>
+
+            <if test="userNames != null and userNames.size > 0">
+                AND vprf.created_user IN
+                <foreach collection="userNames" item="name" open="(" separator="," close=")">
+                    #{name}
+                </foreach>
+            </if>
+        </where>
+
+        ORDER BY ISNULL(vprf.report_form_order,0) ASC, vprf.report_form_order ASC, vprf.updated_time DESC;
+    </select>
+</mapper>

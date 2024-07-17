@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiseco.var.process.app.server.repository.VarProcessServiceManifestMapper">
+
+    <!--获取实时服务-变量清单的名称集合(公共服务,给监控报表调用)-->
+    <select id="getServiceManifestName" resultType="com.wiseco.var.process.app.server.controller.vo.output.ServiceManifestNameVo">
+        SELECT distinct vpsm.service_id AS serviceId, vpsm.manifest_id AS manifestId
+        FROM var_process_service_manifest AS vpsm
+        WHERE vpsm.service_id IN (
+        SELECT vpsv.id FROM var_process_service_version vpsv
+        WHERE 	vpsv.delete_flag = 1 AND vpsv.state = 'ENABLED'
+        ) AND
+        vpsm.manifest_id IN (
+            SELECT vpm.id
+            FROM var_process_manifest AS vpm
+            INNER JOIN var_process_manifest_variable AS vpmv ON vpmv.manifest_id = vpm.id
+            <if test="variableIds != null and variableIds.size > 0">
+                AND vpmv.variable_id IN
+                <foreach collection="variableIds" item="idItem" open="(" separator="," close=")">
+                    #{idItem}
+                </foreach>
+            </if>
+            WHERE vpm.state = 'UP' AND delete_flag = 1);
+    </select>
+
+    <!--获取单个变量对应的变量清单映射信息-->
+    <select id="getVariableAndManifestMapping" resultType="com.wiseco.var.process.app.server.controller.vo.output.ServiceManifestNameVo" parameterType="long">
+        SELECT distinct vpsm.service_id AS serviceId, vpsm.manifest_id AS manifestId
+        FROM var_process_service_manifest AS vpsm
+        WHERE vpsm.service_id IN (
+            select vpsv.id from var_process_service_version vpsv
+            where 	vpsv.delete_flag = 1 and vpsv.state in ('ENABLED', 'DISABLED')
+            ) AND
+        vpsm.manifest_id IN (
+            SELECT vpm.id
+            FROM var_process_manifest AS vpm
+            INNER JOIN var_process_manifest_variable AS vpmv ON vpmv.manifest_id = vpm.id AND vpmv.variable_id = #{variableId}
+            WHERE vpm.state = 'UP' AND delete_flag = 1);
+    </select>
+
+    <select id="findMainManifestByServiceId" resultType="java.lang.Long">
+        select vpsm.manifest_id
+        from var_process_service_manifest vpsm
+        where service_id = #{serviceId}
+          and manifest_role = 1
+          and (vpsm.invalid_time is null or vpsm.invalid_time >= now())
+        order by vpsm.valid_time limit 1
+    </select>
+
+    <select id="findMainManifestByServiceId" resultType="java.lang.Long" databaseId="sqlServer">
+        select vpsm.manifest_id
+        from var_process_service_manifest vpsm
+        where service_id = #{serviceId}
+          and manifest_role = 1
+          and (vpsm.invalid_time is null or vpsm.invalid_time >= GETDATE())
+        order by vpsm.valid_time offset 0 rows fetch next 1 rows only
+    </select>
+</mapper>

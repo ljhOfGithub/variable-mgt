@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiseco.var.process.app.server.repository.VarProcessMonitoringAlertResultMapper">
+
+
+    <select id="getResultPage"
+            parameterType="com.wiseco.var.process.app.server.controller.vo.input.MonitoringResultPageInputVO"
+            resultType="com.wiseco.var.process.app.server.controller.vo.output.MonitoringResultPageOutputVO">
+        select
+        vpmam.conf_name,
+        vpmam.monitoring_target,
+        vpmam.service_name,
+        vpmam.service_version,
+        vpmam.alert_grade,
+        vpmam.message_type,
+        vpmam.alert_message,
+        vpmam.alert_date,
+        vpmam.monitoring_target_name,
+        vpmam.manifest_name
+        FROM var_process_monitoring_alert_message vpmam
+        left join var_process_monitoring_alert_conf vpmac on vpmam.monitoring_alert_conf_id = vpmac.id
+        <where>
+
+            <if test="inputVO.monitoringType != null "  >
+                and vpmam.monitoring_type = #{inputVO.monitoringType}
+            </if>
+
+            <if test="inputVO.serviceName != null and inputVO.serviceName != '' "  >
+                and vpmam.service_name = #{inputVO.serviceName}
+            </if>
+
+            <if test="inputVO.serviceVersion != null and inputVO.serviceVersion != '' ">
+                and vpmam.service_version = #{inputVO.serviceVersion}
+            </if>
+
+            <if test="inputVO.monitoringTarget != null ">
+                and vpmam.monitoring_target = #{inputVO.monitoringTarget}
+            </if>
+
+            <if test="inputVO.alertGrade != null ">
+                and vpmam.alert_grade= #{inputVO.alertGrade}
+            </if>
+
+            <if test="inputVO.messageType != null ">
+                and vpmam.message_type = #{inputVO.messageType}
+            </if>
+
+            <if test="inputVO.manifestName != null and inputVO.manifestName != '' ">
+                and vpmam.manifest_name = #{inputVO.manifestName}
+            </if>
+
+            <if test="inputVO.fuzzyField != null and inputVO.fuzzyField != '' ">
+                and (vpmam.monitoring_target_name LIKE concat('%',#{inputVO.fuzzyField},'%') OR vpmam.conf_name LIKE concat('%',#{inputVO.fuzzyField},'%'))
+            </if>
+
+            <if test="inputVO.deptCodes !=null and inputVO.deptCodes.size() != 0">
+                AND vpmac.dept_code in
+                <foreach item="item" collection='inputVO.deptCodes' open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+            <if test="inputVO.userNames !=null and inputVO.userNames.size() != 0">
+                AND vpmac.created_user in
+                <foreach item="item" collection='inputVO.userNames' open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        order by ${inputVO.sortedKey} ${inputVO.sortMethod}
+
+    </select>
+
+</mapper>

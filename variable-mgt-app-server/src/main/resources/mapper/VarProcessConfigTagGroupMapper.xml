@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiseco.var.process.app.server.repository.VarProcessConfigTagGroupMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wiseco.var.process.app.server.service.dto.VarProcessConfigTagGroupDto">
+        <result column="group_id" property="groupId"/>
+        <result column="group_name" property="groupName"/>
+        <result column="updated_user" property="updatedUser"/>
+        <result column="updated_time" property="updatedTime"/>
+
+        <collection property="tagList" column="group_id"
+                    ofType="com.wiseco.var.process.app.server.service.dto.VarProcessConfigTagDto" javaType="ArrayList">
+            <result column="group_id" property="groupId"/>
+            <result column="tag_id" property="tagId"/>
+            <result column="tag_name" property="tagName"/>
+            <result column="sort_order" property="sortOrder"/>
+        </collection>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        var_process_space_id, group_name, created_user, updated_user, created_time, updated_time
+    </sql>
+
+    <select id="getList" resultMap="BaseResultMap">
+        SELECT
+        g.id as group_id,g.group_name, g.updated_user,g.updated_time
+        from var_process_config_tag_group g
+        <where>
+            g.var_process_space_id = #{spaceId}
+
+            <if test="keywords != null and keywords!=''">
+                AND
+                <if test="idList != null and idList.size()>0">
+                    (
+                </if>
+                g.group_name like CONCAT(concat('%',#{keywords}),'%')
+
+                <if test="idList != null and idList.size()>0">
+                    or g.id in
+                    <foreach collection="idList" item="item" separator="," open="(" close=")">
+                        #{item}
+                    </foreach>
+
+                    )
+                </if>
+            </if>
+            <if test="deptCodes !=null and deptCodes.size() != 0">
+                AND dept_code in
+                <foreach item="item" collection='deptCodes' open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+            <if test="userNames !=null and userNames.size() != 0">
+                AND created_user in
+                <foreach item="item" collection='userNames' open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+
+        order by g.order_no asc
+
+    </select>
+
+    <select id="getTagTrees" resultMap="BaseResultMap">
+        SELECT
+        g.id as group_id,g.group_name, g.updated_user,g.updated_time,
+        t.id as tag_id,t.name as tag_name,t.sort_order
+        from var_process_config_tag_group g
+        LEFT JOIN var_process_config_tag t on g.id=t.group_id
+        <where>
+            <if test="spaceId != null and spaceId!=''">
+                AND g.var_process_space_id = #{spaceId}
+            </if>
+            <if test="keywords != null and keywords!=''">
+                AND (g.group_name like CONCAT(concat('%',#{keywords}),'%') or t.name like
+                CONCAT(concat('%',#{keywords}),'%') )
+            </if>
+            <if test="deptCodes !=null and deptCodes.size() != 0">
+                AND g.dept_code in
+                <foreach item="item" collection='deptCodes' open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+            <if test="userNames !=null and userNames.size() != 0">
+                AND g.created_user in
+                <foreach item="item" collection='userNames' open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+
+        order by g.order_no asc,t.sort_order asc
+
+    </select>
+
+</mapper>

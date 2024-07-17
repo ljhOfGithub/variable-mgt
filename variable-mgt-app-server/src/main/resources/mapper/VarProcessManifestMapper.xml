@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiseco.var.process.app.server.repository.VarProcessManifestMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wiseco.var.process.app.server.repository.entity.VarProcessManifest">
+        <result column="id" property="id"/>
+        <result column="var_process_space_id" property="varProcessSpaceId"/>
+        <result column="service_id" property="serviceId"/>
+        <result column="version" property="version"/>
+        <result column="state" property="state"/>
+        <result column="serial_no" property="serialNo"/>
+        <result column="description" property="description"/>
+        <result column="schema_snapshot" property="schemaSnapshot"/>
+        <result column="parent_manifest_id" property="parentManifestId"/>
+        <result column="delete_flag" property="deleteFlag"/>
+        <result column="created_user" property="createdUser"/>
+        <result column="updated_user" property="updatedUser"/>
+        <result column="created_time" property="createdTime"/>
+        <result column="updated_time" property="updatedTime"/>
+        <result column="var_manifest_name" property="varManifestName"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="dept_code" property="deptCode"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        var_process_space_id, service_id, version, state, serial_no, description, schema_snapshot, delete_flag,
+        parent_manifest_id, created_user, updated_user, created_time, updated_time
+    </sql>
+
+    <select id="getManifestList" parameterType="com.wiseco.var.process.app.server.service.dto.ManifestListQueryDto"
+            resultType="com.wiseco.var.process.app.server.repository.entity.VarProcessManifest">
+        SELECT vpm.id,
+        vpm.var_manifest_name,
+        vpm.category_id,
+        vpm.state,
+        vpm.created_user,
+        vpm.created_time,
+        vpm.updated_user,
+        vpm.updated_time,
+        vpm.dept_code,
+        IFNULL(manifest_usage.is_used, false) as is_used,
+        IFNULL(manifest_test.is_tested, false) as is_tested
+        FROM var_process_manifest vpm
+        -- 服务-清单使用情况
+        LEFT JOIN (SELECT vpsm.manifest_id as manifest_id, IF(COUNT(vpsm.manifest_id) > 0, true, false) as is_used
+        FROM var_process_service_manifest vpsm
+        INNER JOIN var_process_manifest vpm1 on vpm1.id = vpsm.manifest_id
+        GROUP BY vpsm.manifest_id
+        union
+        select distinct manifest_id as manifest_id, IF(COUNT(vpbb.manifest_id) > 0, true, false) as is_used
+        from var_process_batch_backtracking vpbb
+        inner join var_process_manifest vpm6 on vpm6.id = vpbb.manifest_id
+        where vpbb.delete_flag = 1
+        GROUP BY vpbb.manifest_id
+        ) AS manifest_usage
+        ON vpm.id = manifest_usage.manifest_id
+        -- 是否测试
+        LEFT JOIN (SELECT test.variable_id AS manifest_id, IF(COUNT(test_result.test_id) > 0, true, false) AS is_tested
+        FROM var_process_manifest vpm2
+        INNER JOIN var_process_test test ON test.variable_id = vpm2.id AND test.delete_flag = 1 and test.test_type = 3
+        INNER JOIN var_process_test_results test_result ON test.id = test_result.test_id
+        GROUP BY test.variable_id
+        ) AS manifest_test
+        ON vpm.id = manifest_test.manifest_id
+
+        <where>
+            delete_flag =1 AND var_process_space_id = #{queryDto.spaceId}
+            <if test="queryDto.categoryIds != null and queryDto.categoryIds.size() !=0">
+                AND category_id in
+                <foreach collection="queryDto.categoryIds" item="categoryId" open="(" separator="," close=")">
+                    #{categoryId}
+                </foreach>
+            </if>
+            <if test="queryDto.status != null">
+                AND state = #{queryDto.status}
+            </if>
+            <if test="queryDto.deptCode != null and queryDto.deptCode != ''">
+                AND dept_code = #{queryDto.deptCode}
+            </if>
+            <if test="queryDto.keywords != null and queryDto.keywords!=''">
+                AND var_manifest_name like concat(concat('%',#{queryDto.keywords}),'%')
+            </if>
+            <if test="queryDto.used != null">
+                and IFNULL(manifest_usage.is_used, false) = #{queryDto.used}
+            </if>
+            <if test="queryDto.tested != null">
+                and IFNULL(manifest_test.is_tested,false) = #{queryDto.tested}
+            </if>
+            <if test="queryDto.deptCode != null and queryDto.deptCode != ''">
+                and vpm.dept_code = #{queryDto.deptCode}
+            </if>
+            <if test="queryDto.deptCodes !=null and queryDto.deptCodes.size() != 0">
+                AND vpm.dept_code in
+                <foreach item="item" collection='queryDto.deptCodes' open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+            <if test="queryDto.userNames !=null and queryDto.userNames.size() != 0">
+                AND vpm.created_user in
+                <foreach item="item" collection='queryDto.userNames' open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        order by ${queryDto.sortedKey} ${queryDto.sortmethod} ,updated_time desc
+    </select>
+
+    <select id="getManifestList" parameterType="com.wiseco.var.process.app.server.service.dto.ManifestListQueryDto"
+            resultType="com.wiseco.var.process.app.server.repository.entity.VarProcessManifest"
+            databaseId="sqlServer">
+        SELECT vpm.id,
+        vpm.var_manifest_name,
+        vpm.category_id,
+        vpm.state,
+        vpm.created_user,
+        vpm.created_time,
+        vpm.updated_user,
+        vpm.updated_time,
+        vpm.dept_code,
+        ISNULL(manifest_usage.is_used, 'false') as is_used,
+        ISNULL(manifest_test.is_tested, 'false') as is_tested
+        FROM var_process_manifest vpm
+        -- 服务-清单使用情况
+        LEFT JOIN (SELECT vpsm.manifest_id as manifest_id, IIF(COUNT(vpsm.manifest_id) > 0, 'true', 'false') as is_used
+        FROM var_process_service_manifest vpsm
+        INNER JOIN var_process_manifest vpm1 on vpm1.id = vpsm.manifest_id
+        GROUP BY vpsm.manifest_id
+        union
+        select distinct manifest_id as manifest_id, IIF(COUNT(vpbb.manifest_id) > 0, 'true', 'false') as is_used
+        from var_process_batch_backtracking vpbb
+        inner join var_process_manifest vpm6 on vpm6.id = vpbb.manifest_id
+        where vpbb.delete_flag = 1
+        GROUP BY vpbb.manifest_id
+        ) AS manifest_usage
+        ON vpm.id = manifest_usage.manifest_id
+        -- 是否测试
+        LEFT JOIN (SELECT test.variable_id AS manifest_id, IIF(COUNT(test_result.test_id) > 0, 'true', 'false') AS is_tested
+        FROM var_process_manifest vpm2
+        INNER JOIN var_process_test test ON test.variable_id = vpm2.id AND test.delete_flag = 1 and test.test_type = 3
+        INNER JOIN var_process_test_results test_result ON test.id = test_result.test_id
+        GROUP BY test.variable_id
+        ) AS manifest_test
+        ON vpm.id = manifest_test.manifest_id
+
+        <where>
+            delete_flag =1 AND var_process_space_id = #{queryDto.spaceId}
+            <if test="queryDto.categoryIds != null and queryDto.categoryIds.size() !=0">
+                AND category_id in
+                <foreach collection="queryDto.categoryIds" item="categoryId" open="(" separator="," close=")">
+                    #{categoryId}
+                </foreach>
+            </if>
+            <if test="queryDto.status != null">
+                AND state = #{queryDto.status}
+            </if>
+            <if test="queryDto.deptCode != null and queryDto.deptCode != ''">
+                AND dept_code = #{queryDto.deptCode}
+            </if>
+            <if test="queryDto.keywords != null and queryDto.keywords!=''">
+                AND var_manifest_name like concat(concat('%',#{queryDto.keywords}),'%')
+            </if>
+            <if test="queryDto.used != null">
+                and ISNULL(manifest_usage.is_used, 'false') = #{queryDto.used}
+            </if>
+            <if test="queryDto.tested != null">
+                and ISNULL(manifest_test.is_tested,'false') = #{queryDto.tested}
+            </if>
+            <if test="queryDto.deptCode != null and queryDto.deptCode != ''">
+                and vpm.dept_code = #{queryDto.deptCode}
+            </if>
+            <if test="queryDto.deptCodes !=null and queryDto.deptCodes.size() != 0">
+                AND vpm.dept_code in
+                <foreach item="item" collection='queryDto.deptCodes' open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+            <if test="queryDto.userNames !=null and queryDto.userNames.size() != 0">
+                AND vpm.created_user in
+                <foreach item="item" collection='queryDto.userNames' open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        <if test="queryDto.sortedKey != 'updated_time'">
+            order by ${queryDto.sortedKey} ${queryDto.sortmethod} ,updated_time desc
+        </if>
+        <if test="queryDto.sortedKey == 'updated_time'">
+        order by updated_time desc
+        </if>
+    </select>
+
+    <!--根据服务ID获取它关联的变量清单名称-->
+    <select id="getManifestNameByServiceId" resultType="string" parameterType="long">
+        SELECT DISTINCT vpm.var_manifest_name
+        FROM var_process_manifest AS vpm
+        INNER JOIN var_process_service_manifest AS vpsm ON
+        vpsm.manifest_id = vpm.id
+        AND vpsm.service_id = #{serviceId};
+    </select>
+
+</mapper>

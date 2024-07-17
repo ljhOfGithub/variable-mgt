@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiseco.var.process.app.server.repository.VarProcessMonitoringAlertConfMapper">
+
+
+    <select id="getPage"
+            parameterType="com.wiseco.var.process.app.server.service.dto.MonitoringConfigurationPageQueryDto"
+            resultType="com.wiseco.var.process.app.server.repository.entity.VarProcessMonitoringAlertConf">
+        select
+        id,monitoring_type,conf_name,conf_desc,service_name,service_version,manifest_name,monitoring_target,alert_info,param_configuration_info,monitoring_state,
+        created_user,updated_user,created_time,updated_time
+        from var_process_monitoring_alert_conf
+        <where>
+            <if test="queryDto.monitoringType != null ">
+                and monitoring_type = #{queryDto.monitoringType}
+            </if>
+
+            <if test="queryDto.serviceName != null ">
+                and service_name = #{queryDto.serviceName}
+            </if>
+
+            <if test="queryDto.serviceVersion != null ">
+                and service_version = #{queryDto.serviceVersion}
+            </if>
+
+            <if test="queryDto.manifestName != null ">
+                and manifest_name= #{queryDto.manifestName}
+            </if>
+
+            <if test="queryDto.monitoringTarget != null ">
+                and monitoring_target = #{queryDto.monitoringTarget}
+            </if>
+
+            <if test="queryDto.alertGrade != null ">
+                and alert_grade = #{queryDto.alertGrade}
+            </if>
+
+            <if test="queryDto.monitoringState!= null ">
+                and monitoring_state = #{queryDto.monitoringState}
+            </if>
+
+            <if test="queryDto.confName != null ">
+                and conf_name LIKE concat('%',#{queryDto.confName},'%')
+            </if>
+
+            <if test="queryDto.deptCodes !=null and queryDto.deptCodes.size() != 0">
+                AND dept_code in
+                <foreach item="item" collection='queryDto.deptCodes' open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+
+            <if test="queryDto.userNames !=null and queryDto.userNames.size() != 0">
+                AND created_user in
+                <foreach item="item" collection='queryDto.userNames' open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        <if test="queryDto.sortKey != 'updated_time'">
+            order by ${queryDto.sortKey} ${queryDto.sortType}, updated_time desc
+        </if>
+        <if test="queryDto.sortKey == 'updated_time'">
+            order by updated_time desc
+        </if>
+    </select>
+
+</mapper>
